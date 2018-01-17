@@ -101,7 +101,7 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
         // TODO: by default use a Prototype containing only the $id or $ref for the TargetSchema
         ObjectNode tgtSchema = generateSchema(method.getReturnType());
         if (tgtSchema != null)
-            link.put("targetSchema", tgtSchema);
+            link.set("targetSchema", tgtSchema);
 
         // Check possible params and form schema attribute.
         // If it has QueryParam or FormParam than the schema must have these params as properties.
@@ -126,7 +126,7 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
                             schema.put("type", "object");
                         }
                         QueryParam q = (QueryParam) a;
-                        schema.put(q.value(), jsonSchemaGenerator.generateSchema(paramTypes[i]));
+                        schema.set(q.value(), jsonSchemaGenerator.generateSchema(paramTypes[i]));
                         prop = q.value();
                         hasParam = true;
                         isBodyParam = false;
@@ -138,7 +138,7 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
                         }
                         FormParam q = (FormParam) a;
 
-                        schema.put(q.value(), jsonSchemaGenerator.generateSchema(paramTypes[i]));
+                        schema.set(q.value(), jsonSchemaGenerator.generateSchema(paramTypes[i]));
                         prop = q.value();
                         hasParam = true;
                         isBodyParam = false;
@@ -200,7 +200,7 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
                         ObjectNode hs = (ObjectNode) schema.get(prop);
                         hs.put(MEDIA_TYPE, media.type());
                         hs.put(BINARY_ENCODING, media.binaryEncoding());
-                        schema.put(prop, hs);
+                        schema.set(prop, hs);
                     }
                 }
             }
@@ -208,7 +208,7 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
             if (hasBodyParam && hasParam)
                 throw new RuntimeException("JsonSchema does not support both FormParam or QueryParam and BodyParam at the same time.");
 
-            link.put("schema", schema);
+            link.set("schema", schema);
         }
 
         return link;
@@ -277,7 +277,7 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
                     } else {
                         hyperProp.put("type", "string");
                     }
-                    properties.put(prop, hyperProp);
+                    properties.set(prop, hyperProp);
                 }
             } catch (NoSuchFieldException e) {
                 //e.printStackTrace();
@@ -305,7 +305,7 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
                         ParameterizedType genericType = (ParameterizedType) field.getGenericType();
                         Class<?> genericClass = (Class<?>) genericType.getActualTypeArguments()[0];
                         ObjectNode hyperItems = transformJsonToHyperSchema(genericClass, (ObjectNode) items);
-                        jsonSchema.put("items", hyperItems);
+                        jsonSchema.set("items", hyperItems);
                     }
                     hyperSchema = jsonSchema;
                 } else if (jsonSchema.has("properties")) {

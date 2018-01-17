@@ -105,7 +105,7 @@ public class CustomSchemaWrapper extends SchemaWrapper implements Iterable<Prope
         if (!getNode().has(TAG_PROPERTIES))
             getNode().putObject(TAG_PROPERTIES);
 
-        ((ObjectNode) getNode().get(TAG_PROPERTIES)).put(propertyWrapper.getName(), propertyWrapper.asJson());
+        ((ObjectNode) getNode().get(TAG_PROPERTIES)).set(propertyWrapper.getName(), propertyWrapper.asJson());
 
         if (propertyWrapper.isRequired())
             addRequired(propertyWrapper.getName());
