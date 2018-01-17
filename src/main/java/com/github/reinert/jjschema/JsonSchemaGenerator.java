@@ -37,6 +37,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -129,9 +130,8 @@ public abstract class JsonSchemaGenerator {
      * default values.
      *
      * @param schema
-     * @param props
      */
-    protected abstract void processSchemaProperty(ObjectNode schema, Attributes props);
+    protected abstract void processSchemaProperty(ObjectNode schema, AttributeHolder attributeHolder);
 
     protected ObjectNode createInstance() {
         return mapper.createObjectNode();
@@ -298,9 +298,8 @@ public abstract class JsonSchemaGenerator {
     }
 
     protected <T> void processRootAttributes(Class<T> type, ObjectNode schema) {
-        Attributes sProp = type.getAnnotation(Attributes.class);
-        if (sProp != null)
-            processSchemaProperty(schema, sProp);
+        Optional<AttributeHolder> rootAttributes = AttributeHolder.locate(type);
+        rootAttributes.ifPresent(attributeHolder -> processSchemaProperty(schema, attributeHolder));
     }
 
     protected <T> void processProperties(Class<T> type, ObjectNode schema) throws TypeException {
@@ -402,11 +401,12 @@ public abstract class JsonSchemaGenerator {
         // Check the field annotations, if the get method references a field, or the
         // method annotations on the other hand, and processSchemaProperty them to
         // the JsonSchema object
-        Attributes attrs = propertyReflection.getAnnotation(Attributes.class);
-        if (attrs != null) {
-            processSchemaProperty(schema, attrs);
-            // The declaration of $schema is only necessary at the root object
-            schema.remove("$schema");
+
+        Optional<AttributeHolder> fieldAttributes = AttributeHolder.locate(propertyReflection);
+        if (fieldAttributes.isPresent()) {
+                processSchemaProperty(schema, fieldAttributes.get());
+                // The declaration of $schema is only necessary at the root object
+                schema.remove("$schema");
         }
 
         // Check if the Nullable annotation is present, and if so, add 'null' to type attr

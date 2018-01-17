@@ -3,64 +3,46 @@ package com.github.reinert.jjschema;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class JJSchemaUtil {
+public final class JJSchemaUtil {
     private JJSchemaUtil() {
     }
 
-    public static void processCommonAttributes(ObjectNode node, Attributes attributes) {
-        if (!attributes.id().isEmpty()) {
-            node.put("id", attributes.id());
-        }
-        if (!attributes.description().isEmpty()) {
-            node.put("description", attributes.description());
-        }
-        if (!attributes.pattern().isEmpty()) {
-            node.put("pattern", attributes.pattern());
-        }
-        if (!attributes.format().isEmpty()) {
-            node.put("format", attributes.format());
-        }
-        if (!attributes.title().isEmpty()) {
-            node.put("title", attributes.title());
-        }
-        if (attributes.maximum() > -1) {
-            node.put("maximum", attributes.maximum());
-        }
-        if (attributes.exclusiveMaximum()) {
+    public static void processCommonAttributes(ObjectNode node, AttributeHolder attributeHolder) {
+        attributeHolder.id().ifPresent(id -> node.put("id", id));
+        attributeHolder.description().ifPresent(description -> node.put("description", description));
+        attributeHolder.pattern().ifPresent(pattern -> node.put("pattern", pattern));
+        attributeHolder.format().ifPresent(format -> node.put("format", format));
+        attributeHolder.title().ifPresent(title -> node.put("title", title));
+        attributeHolder.maximum().ifPresent(maximum -> node.put("maximum", maximum));
+
+        if (attributeHolder.exclusiveMaximum()) {
             node.put("exclusiveMaximum", true);
         }
-        if (attributes.minimum() > -1) {
-            node.put("minimum", attributes.minimum());
-        }
-        if (attributes.exclusiveMinimum()) {
+
+        attributeHolder.minimum().ifPresent(minimum -> node.put("minimum", minimum));
+
+        if (attributeHolder.exclusiveMinimum()) {
             node.put("exclusiveMinimum", true);
         }
-        if (attributes.enums().length > 0) {
+
+        if (!attributeHolder.enums().isEmpty()) {
             ArrayNode enumArray = node.putArray("enum");
-            String[] enums = attributes.enums();
-            for (String v : enums) {
+            for (String v : attributeHolder.enums()) {
                 enumArray.add(v);
             }
         }
-        if (attributes.uniqueItems()) {
+
+        if (attributeHolder.uniqueItems()) {
             node.put("uniqueItems", true);
         }
-        if (attributes.minItems() > 0) {
-            node.put("minItems", attributes.minItems());
-        }
-        if (attributes.maxItems() > -1) {
-            node.put("maxItems", attributes.maxItems());
-        }
-        if (attributes.multipleOf() > 0) {
-            node.put("multipleOf", attributes.multipleOf());
-        }
-        if (attributes.minLength() > 0) {
-            node.put("minLength", attributes.minLength());
-        }
-        if (attributes.maxLength() > -1) {
-            node.put("maxLength", attributes.maxLength());
-        }
-        if (attributes.readonly()) {
+
+        attributeHolder.minItems().ifPresent(minItems -> node.put("minItems", minItems));
+        attributeHolder.maxItems().ifPresent(maxItems -> node.put("maxItems", maxItems));
+        attributeHolder.multipleOf().ifPresent(multipleOf -> node.put("multipleOf", multipleOf));
+        attributeHolder.minLength().ifPresent(minLength -> node.put("minLength", minLength));
+        attributeHolder.maxLength().ifPresent(maxLength -> node.put("maxLength", maxLength));
+
+        if (attributeHolder.readonly()) {
             node.put("readonly", true);
         }
     }

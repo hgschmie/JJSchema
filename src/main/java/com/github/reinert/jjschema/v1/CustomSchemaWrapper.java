@@ -20,6 +20,13 @@ package com.github.reinert.jjschema.v1;
 
 import static com.github.reinert.jjschema.JJSchemaUtil.processCommonAttributes;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.AttributeHolder;
+import com.github.reinert.jjschema.ManagedReference;
+import com.google.common.collect.Lists;
+import com.google.common.collect.ObjectArrays;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -33,14 +40,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.reinert.jjschema.Attributes;
-import com.github.reinert.jjschema.ManagedReference;
-import com.google.common.collect.Lists;
-import com.google.common.collect.ObjectArrays;
 
 /**
  * @author Danilo Reinert
@@ -93,22 +94,25 @@ public class CustomSchemaWrapper extends SchemaWrapper implements Iterable<Prope
     }
 
     protected void addTokenToRelativeId(String token) {
-        if (token.startsWith("#"))
+        if (token.startsWith("#")) {
             relativeId = token;
-        else
+        } else {
             relativeId = relativeId + "/" + token;
+        }
     }
 
     public void addProperty(PropertyWrapper propertyWrapper) {
         this.propertyWrappers.add(propertyWrapper);
 
-        if (!getNode().has(TAG_PROPERTIES))
+        if (!getNode().has(TAG_PROPERTIES)) {
             getNode().putObject(TAG_PROPERTIES);
+        }
 
         ((ObjectNode) getNode().get(TAG_PROPERTIES)).set(propertyWrapper.getName(), propertyWrapper.asJson());
 
-        if (propertyWrapper.isRequired())
+        if (propertyWrapper.isRequired()) {
             addRequired(propertyWrapper.getName());
+        }
     }
 
     public boolean isRequired() {
@@ -116,15 +120,17 @@ public class CustomSchemaWrapper extends SchemaWrapper implements Iterable<Prope
     }
 
     public void addRequired(String name) {
-        if (!getNode().has(TAG_REQUIRED))
+        if (!getNode().has(TAG_REQUIRED)) {
             getNode().putArray(TAG_REQUIRED);
+        }
         ArrayNode requiredNode = (ArrayNode) getNode().get(TAG_REQUIRED);
         requiredNode.add(name);
     }
 
     public boolean pullReference(ManagedReference managedReference) {
-        if (managedReferences.contains(managedReference))
+        if (managedReferences.contains(managedReference)) {
             return false;
+        }
         managedReferences.add(managedReference);
         return true;
     }
@@ -151,17 +157,18 @@ public class CustomSchemaWrapper extends SchemaWrapper implements Iterable<Prope
     protected void processProperties() {
         HashMap<Method, Field> properties = findProperties();
         for (Entry<Method, Field> prop : properties.entrySet()) {
-            PropertyWrapper propertyWrapper = new PropertyWrapper(this, managedReferences, 
+            PropertyWrapper propertyWrapper = new PropertyWrapper(this, managedReferences,
                     prop.getKey(), prop.getValue());
-            if (!propertyWrapper.isEmptyWrapper())
+            if (!propertyWrapper.isEmptyWrapper()) {
                 addProperty(propertyWrapper);
+            }
         }
     }
 
     private HashMap<Method, Field> findProperties() {
         Field[] fields = new Field[0];
         Class<?> javaType = getJavaType();
-        while(javaType.getSuperclass() != null) {
+        while (javaType.getSuperclass() != null) {
             fields = ObjectArrays.concat(fields, javaType.getDeclaredFields(), Field.class);
             javaType = javaType.getSuperclass();
         }
@@ -229,13 +236,15 @@ public class CustomSchemaWrapper extends SchemaWrapper implements Iterable<Prope
     }
 
     protected void processAttributes(ObjectNode node, Type type) {
-        final Attributes attributes = getJavaType().getAnnotation(Attributes.class);
-        if (attributes != null) {
-            processCommonAttributes(node, attributes);
-            if (attributes.required()) {
+        final Optional<AttributeHolder> attributeHolder = AttributeHolder.locate(getJavaType());
+
+        if (attributeHolder.isPresent()) {
+            processCommonAttributes(node, attributeHolder.get());
+
+            if (attributeHolder.get().required()) {
                 setRequired(true);
             }
-            if (!attributes.additionalProperties()) {
+            if (!attributeHolder.get().additionalProperties()) {
                 node.put("additionalProperties", false);
             }
         }

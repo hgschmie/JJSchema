@@ -19,6 +19,7 @@
 package com.github.reinert.jjschema;
 
 import static com.github.reinert.jjschema.JJSchemaUtil.processCommonAttributes;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.v1.SchemaWrapper;
@@ -33,16 +34,16 @@ import com.github.reinert.jjschema.v1.SchemaWrapper;
 public class JsonSchemaGeneratorV4 extends JsonSchemaGenerator {
 
     @Override
-    protected void processSchemaProperty(ObjectNode schema, Attributes attributes) {
-        if (!attributes.$ref().isEmpty()) {
-            schema.put("$ref", attributes.$ref());
-        }
+    protected void processSchemaProperty(ObjectNode schema, AttributeHolder attributeHolder) {
+        checkNotNull(attributeHolder, "attributeHolder is null");
+        attributeHolder.$ref().ifPresent($ref -> schema.put("$ref", $ref));
+
         if (autoPutVersion) {
             schema.put("$schema", SchemaWrapper.DRAFT_04);
         }
-        processCommonAttributes(schema, attributes);
+        processCommonAttributes(schema, attributeHolder);
 
-        if (attributes.required()) {
+        if (attributeHolder.required()) {
             schema.put("selfRequired", true);
         }
     }
