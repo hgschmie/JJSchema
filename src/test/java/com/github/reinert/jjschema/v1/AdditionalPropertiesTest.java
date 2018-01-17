@@ -21,7 +21,7 @@ package com.github.reinert.jjschema.v1;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.Attributes;
+import com.github.reinert.jjschema.JsonSchema;
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -57,7 +57,7 @@ public class AdditionalPropertiesTest extends TestCase {
         assertFalse(properties.findValue("additionalProperties").asBoolean());
     }
 
-    @Attributes(title = "Sale Parent Schema", additionalProperties = false)
+    @JsonSchema(title = "Sale Parent Schema", additionalProperties = false)
     static class Sale {
         int id;
 
@@ -80,7 +80,7 @@ public class AdditionalPropertiesTest extends TestCase {
         }
     }
 
-    @Attributes(title = "Sale Item Child Schema", additionalProperties = false)
+    @JsonSchema(title = "Sale Item Child Schema", additionalProperties = false)
     static class SaleItem {
         int idSale;
         String name;

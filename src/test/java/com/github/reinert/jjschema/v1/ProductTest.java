@@ -21,7 +21,8 @@ package com.github.reinert.jjschema.v1;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.reinert.jjschema.Attributes;
+import com.github.reinert.jjschema.JsonSchema;
+import com.github.reinert.jjschema.JsonSchema;
 import com.github.reinert.jjschema.exception.UnavailableVersion;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
@@ -74,16 +75,16 @@ public class ProductTest extends TestCase {
         */
     }
 
-    @Attributes(title = "Product", description = "A product from Acme's catalog")
+    @JsonSchema(title = "Product", description = "A product from Acme's catalog")
     static class Product {
 
-        @Attributes(required = true, description = "The unique identifier for a product")
+        @JsonSchema(required = true, description = "The unique identifier for a product")
         private long id;
-        @Attributes(required = true, description = "Name of the product")
+        @JsonSchema(required = true, description = "Name of the product")
         private String name;
-        @Attributes(required = true, minimum = 0, exclusiveMinimum = true)
+        @JsonSchema(required = true, minimum = 0, exclusiveMinimum = true)
         private BigDecimal price;
-        @Attributes(minItems = 1, uniqueItems = true)
+        @JsonSchema(minItems = 1, uniqueItems = true)
         private List<String> tags;
 
         public long getId() {
@@ -123,7 +124,7 @@ public class ProductTest extends TestCase {
     static class ComplexProduct extends Product {
 
         private Dimension dimensions;
-        @Attributes(description = "Coordinates of the warehouse with the product")
+        @JsonSchema(description = "Coordinates of the warehouse with the product")
         private Geo warehouseLocation;
 
         public Dimension getDimensions() {
@@ -146,11 +147,11 @@ public class ProductTest extends TestCase {
 
     static class Dimension {
 
-        @Attributes(required = true)
+        @JsonSchema(required = true)
         private double length;
-        @Attributes(required = true)
+        @JsonSchema(required = true)
         private double width;
-        @Attributes(required = true)
+        @JsonSchema(required = true)
         private double height;
 
         public double getLength() {
@@ -179,7 +180,7 @@ public class ProductTest extends TestCase {
 
     }
 
-    @Attributes($ref = "http://json-schema.org/geo", description = "A geographical coordinate")
+    @JsonSchema($ref = "http://json-schema.org/geo", description = "A geographical coordinate")
     static class Geo {
 
         private BigDecimal latitude;
@@ -202,7 +203,7 @@ public class ProductTest extends TestCase {
         }
     }
 
-    @Attributes(title = "Product set")
+    @JsonSchema(title = "Product set")
     static class ProductSet implements Iterable<ComplexProduct> {
 
         // NOTE: all custom collection types must declare the wrapped collection

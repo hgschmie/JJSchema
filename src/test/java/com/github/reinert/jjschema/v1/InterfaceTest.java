@@ -21,7 +21,7 @@ package com.github.reinert.jjschema.v1;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.Attributes;
+import com.github.reinert.jjschema.JsonSchema;
 import com.github.reinert.jjschema.Nullable;
 import com.github.reinert.jjschema.exception.UnavailableVersion;
 import junit.framework.TestCase;
@@ -57,29 +57,29 @@ public class InterfaceTest extends TestCase {
 
     interface UserInterface {
 
-        @Attributes(required = true, title = "ID", minimum = 100000, maximum = 999999)
+        @JsonSchema(required = true, title = "ID", minimum = 100000, maximum = 999999)
         short getId();
 
         void setId(short id);
 
-        @Attributes(required = true, description = "User's name")
+        @JsonSchema(required = true, description = "User's name")
         String getName();
 
         void setName(String name);
 
-        @Attributes(description = "User's sex", enums = {"M", "F"})
+        @JsonSchema(description = "User's sex", enums = {"M", "F"})
         @Nullable
         char getSex();
 
         void setSex(char sex);
 
-        @Attributes(description = "User's personal photo")
+        @JsonSchema(description = "User's personal photo")
         @Nullable
         Byte[] getPhoto();
 
         void setPhoto(Byte[] photo);
 
-        @Attributes(format = "date-time")
+        @JsonSchema(format = "date-time")
         Instant getBirthday();
     }
 }

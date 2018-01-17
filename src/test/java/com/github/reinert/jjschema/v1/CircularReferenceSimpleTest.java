@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.Attributes;
+import com.github.reinert.jjschema.JsonSchema;
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class CircularReferenceSimpleTest extends TestCase {
         System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(schema));
     }
 
-    @Attributes(id = "#sale")
+    @JsonSchema(id = "#sale")
     static class Sale {
         int id;
         @JsonManagedReference

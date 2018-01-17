@@ -1,9 +1,10 @@
 package com.github.reinert.jjschema.inheritance;
 
-import com.github.reinert.jjschema.Attributes;
+import com.github.reinert.jjschema.JsonSchema;
 
 public class CollegeStudent extends Student {
-    @Attributes(required = true, description = "college major")
+
+    @JsonSchema(required = true, description = "college major")
     private String major;
 
     public String getMajor() {

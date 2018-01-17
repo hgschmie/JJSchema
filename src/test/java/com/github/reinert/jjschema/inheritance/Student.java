@@ -1,9 +1,10 @@
 package com.github.reinert.jjschema.inheritance;
 
-import com.github.reinert.jjschema.Attributes;
+import com.github.reinert.jjschema.JsonSchema;
 
 public class Student {
-    @Attributes(required = true, description = "student name")
+
+    @JsonSchema(required = true, description = "student name")
     private String name;
 
     public String getName() {

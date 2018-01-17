@@ -20,7 +20,7 @@ package com.github.reinert.jjschema.v1;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.Attributes;
+import com.github.reinert.jjschema.JsonSchema;
 import com.github.reinert.jjschema.Nullable;
 import junit.framework.TestCase;
 
@@ -117,7 +117,7 @@ public class EnumTest extends TestCase {
 
     static class Hyperthing {
 
-        @Attributes(enums = {"GET", "POST", "PUT", "DELETE"})
+        @JsonSchema(enums = {"GET", "POST", "PUT", "DELETE"})
         private String method;
         private IntegerEnum resultCode;
         private FloatingEnum floatingResultCode;

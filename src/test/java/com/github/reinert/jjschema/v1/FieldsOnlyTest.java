@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.Attributes;
+import com.github.reinert.jjschema.JsonSchema;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
 import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.exception.TypeException;
@@ -19,7 +19,7 @@ public class FieldsOnlyTest extends TestCase {
     private final ObjectMapper MAPPER = new ObjectMapper();
 
     static class Employee {
-        @Attributes(required = true, minLength = 5, maxLength = 50, description = "Name")
+        @JsonSchema(required = true, minLength = 5, maxLength = 50, description = "Name")
         private String name;
 
         public String lastName;

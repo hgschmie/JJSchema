@@ -125,7 +125,7 @@ public abstract class JsonSchemaGenerator {
 
 
     /**
-     * Reads {@link Attributes} annotation and put its values into the
+     * Reads annotations and put its values into the
      * generating schema. Usually, some verification is done for not putting the
      * default values.
      *
@@ -564,9 +564,10 @@ public abstract class JsonSchemaGenerator {
                     }
 
                     String name = getNameFromGetter(method);
-                    Attributes attribs = field.getAnnotation(Attributes.class);
+                    Optional<AttributeHolder> attributeHolder = AttributeHolder.locate(field);
+
                     boolean process = true;
-                    if (this.processAnnotatedOnly && attribs == null) {
+                    if (this.processAnnotatedOnly && !attributeHolder.isPresent()) {
                         process = false;
                     }
                             
@@ -612,9 +613,8 @@ public abstract class JsonSchemaGenerator {
 
             String name = field.getName();
             if (field.getName().equalsIgnoreCase(name)) {
-                Attributes attrs = field.getAnnotation(Attributes.class);
-                // Only process annotated fields if processAnnotatedOnly set
-                if (attrs != null || !this.processAnnotatedOnly) {
+                Optional<AttributeHolder> attributeHolder = AttributeHolder.locate(field);
+                if (attributeHolder.isPresent() || !this.processAnnotatedOnly) {
                     props.add(field);
                 }
             }

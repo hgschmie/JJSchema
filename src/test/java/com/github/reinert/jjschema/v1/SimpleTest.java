@@ -21,7 +21,7 @@ package com.github.reinert.jjschema.v1;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.Attributes;
+import com.github.reinert.jjschema.JsonSchema;
 import com.github.reinert.jjschema.exception.UnavailableVersion;
 import junit.framework.TestCase;
 
@@ -60,13 +60,13 @@ public class SimpleTest extends TestCase {
         assertEquals(fromResource, fromJavaType);
     }
 
-    @Attributes(title = "Example Schema")
+    @JsonSchema(title = "Example Schema")
     static class SimpleExample {
-        @Attributes(required = true)
+        @JsonSchema(required = true)
         private String firstName;
-        @Attributes(required = true)
+        @JsonSchema(required = true)
         private String lastName;
-        @Attributes(description = "Age in years", minimum = 0)
+        @JsonSchema(description = "Age in years", minimum = 0)
         private int age;
 
         public String getFirstName() {

@@ -18,24 +18,24 @@
 
 package com.github.reinert.jjschema.model;
 
-import com.github.reinert.jjschema.Attributes;
+import com.github.reinert.jjschema.JsonSchema;
 import com.github.reinert.jjschema.Media;
 import com.github.reinert.jjschema.Nullable;
 
 
 public class User {
 
-    @Attributes(required = true, title = "ID", minimum = 100000, maximum = 999999)
+    @JsonSchema(required = true, title = "ID", minimum = 100000, maximum = 999999)
     private short id;
 
-    @Attributes(required = true, description = "User's name")
+    @JsonSchema(required = true, description = "User's name")
     private String name;
 
-    @Attributes(description = "User's sex", enums = {"M", "F"})
+    @JsonSchema(description = "User's sex", enums = {"M", "F"})
     @Nullable
     private char sex;
 
-    @Attributes(description = "User's personal photo")
+    @JsonSchema(description = "User's personal photo")
     @Media(type = "image/jpg", binaryEncoding = "base64")
     @Nullable
     private Byte[] photo;

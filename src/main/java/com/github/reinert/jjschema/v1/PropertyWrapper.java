@@ -276,9 +276,12 @@ public class PropertyWrapper extends SchemaWrapper {
     }
 
     protected String processId(Class<?> accessibleObject) {
-        final Attributes attributes = accessibleObject.getAnnotation(Attributes.class);
-        if (attributes != null && !attributes.id().isEmpty()) {
-            return attributes.id();
+        final Optional<AttributeHolder> attributeHolder = AttributeHolder.locate(accessibleObject);
+
+        if (attributeHolder.isPresent()) {
+            if (attributeHolder.get().id().isPresent()) {
+                return attributeHolder.get().id().get();
+            }
         }
         return null;
     }
