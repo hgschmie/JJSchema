@@ -20,7 +20,7 @@ package com.github.reinert.jjschema.v1;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.github.reinert.jjschema.Nullable;
+import com.github.reinert.jjschema.annotations.Nullable;
 
 import java.math.BigDecimal;
 

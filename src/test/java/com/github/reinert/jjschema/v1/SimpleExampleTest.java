@@ -20,11 +20,9 @@ package com.github.reinert.jjschema.v1;
 
 import static org.junit.Assert.assertEquals;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.JsonSchema;
-import com.github.reinert.jjschema.exception.UnavailableVersion;
+import com.github.reinert.jjschema.annotations.JsonSchema;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -42,7 +40,7 @@ public class SimpleExampleTest {
      * Test the scheme generate following a scheme source, avaliable at http://json-schema.org/examples.html the output should match the example.
      */
     @Test
-    public void testGenerateSchema() throws UnavailableVersion, JsonProcessingException, IOException {
+    public void testGenerateSchema() throws Exception {
 
         final InputStream in = SimpleExampleTest.class.getResourceAsStream("/simple_example.json");
         if (in == null) {

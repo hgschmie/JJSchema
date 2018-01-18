@@ -1,6 +1,6 @@
 package com.github.reinert.jjschema.inheritance;
 
-import com.github.reinert.jjschema.JsonSchema;
+import com.github.reinert.jjschema.annotations.JsonSchema;
 
 public class Student {
 

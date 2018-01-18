@@ -16,21 +16,15 @@
  * - ASL 2.0: http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package com.github.reinert.jjschema;
+package com.github.reinert.jjschema.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Annotation for rel attribute of JSON Hyper-Schema
- *
- * @author reinert
- */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Rel {
+@Target({ElementType.METHOD, ElementType.FIELD})
+public @interface Nullable {
 
-    String value();
 }

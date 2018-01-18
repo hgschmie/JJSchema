@@ -2,14 +2,11 @@ package com.github.reinert.jjschema.v1;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.JsonSchema;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
 import com.github.reinert.jjschema.SchemaGeneratorBuilder;
-import com.github.reinert.jjschema.exception.TypeException;
-import com.github.reinert.jjschema.exception.UnavailableVersion;
+import com.github.reinert.jjschema.annotations.JsonSchema;
 import junit.framework.TestCase;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -44,7 +41,7 @@ public class FieldsOnlyTest extends TestCase {
         }
     }
 
-    public void testAnnotatedFieldsOnly() throws UnavailableVersion, IOException, TypeException {
+    public void testAnnotatedFieldsOnly() throws Exception {
         JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
                 .processFieldsOnly()
                 .processAnnotatedOnly()
@@ -58,7 +55,7 @@ public class FieldsOnlyTest extends TestCase {
         assertEquals(1, props.size());
     }
 
-    public void testFieldsOnly() throws UnavailableVersion, IOException, TypeException {
+    public void testFieldsOnly() throws Exception {
         JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
                 .processFieldsOnly()
                 .build();
@@ -75,7 +72,7 @@ public class FieldsOnlyTest extends TestCase {
         assertTrue(Arrays.deepEquals(new String[]{"lastName", "name", "retired"}, keyArr));
     }
 
-    public void testNoSortedFields() throws UnavailableVersion, IOException, TypeException {
+    public void testNoSortedFields() throws Exception {
         JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
                 .processFieldsOnly()
                 .dontSortSchemaProperties()

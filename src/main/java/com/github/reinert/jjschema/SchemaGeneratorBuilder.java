@@ -32,10 +32,6 @@ public final class SchemaGeneratorBuilder {
         return new JsonSchemaGeneratorConfigurationBuilder(JsonNodeFactory.instance, config -> new JsonSchemaGeneratorV4(config));
     }
 
-    public static JsonSchemaGeneratorConfigurationBuilder draftV4HyperSchema() {
-        return new JsonSchemaGeneratorConfigurationBuilder(JsonNodeFactory.instance, config -> new HyperSchemaGeneratorV4(new JsonSchemaGeneratorV4(config)));
-    }
-
     public static class JsonSchemaGeneratorConfigurationBuilder {
 
         private final Function<JsonSchemaGeneratorConfiguration, JsonSchemaGenerator> factory;

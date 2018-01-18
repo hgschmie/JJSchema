@@ -28,9 +28,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.AttributeHolder;
 import com.github.reinert.jjschema.ManagedReference;
-import com.github.reinert.jjschema.Nullable;
-import com.github.reinert.jjschema.SchemaIgnore;
-import com.github.reinert.jjschema.SchemaIgnoreProperties;
+import com.github.reinert.jjschema.annotations.Nullable;
+import com.github.reinert.jjschema.annotations.SchemaIgnore;
+import com.github.reinert.jjschema.annotations.SchemaIgnoreProperties;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -49,19 +49,19 @@ import java.util.Set;
 
 public class PropertyWrapper extends SchemaWrapper {
 
-    final static String propertiesStr = "/properties/";
-    final static String itemsStr = "/items";
+    static final String propertiesStr = "/properties/";
+    static final String itemsStr = "/items";
 
-    enum ReferenceType {NONE, FORWARD, BACKWARD}
+    private enum ReferenceType {NONE, FORWARD, BACKWARD}
 
-    final CustomSchemaWrapper ownerSchemaWrapper;
-    final SchemaWrapper schemaWrapper;
-    final Field field;
-    final Method method;
-    String name;
-    boolean required;
-    ManagedReference managedReference;
-    ReferenceType referenceType;
+    private final CustomSchemaWrapper ownerSchemaWrapper;
+    private final SchemaWrapper schemaWrapper;
+    private final Field field;
+    private final Method method;
+    private String name;
+    private boolean required;
+    private ManagedReference managedReference;
+    private ReferenceType referenceType;
 
     public PropertyWrapper(JsonNodeFactory nodeFactory, CustomSchemaWrapper ownerSchemaWrapper, Set<ManagedReference> managedReferences, Method method,
             Field field) {

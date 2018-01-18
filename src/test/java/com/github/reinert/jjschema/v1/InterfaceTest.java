@@ -18,15 +18,12 @@
 
 package com.github.reinert.jjschema.v1;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.JsonSchema;
-import com.github.reinert.jjschema.Nullable;
-import com.github.reinert.jjschema.exception.UnavailableVersion;
+import com.github.reinert.jjschema.annotations.JsonSchema;
+import com.github.reinert.jjschema.annotations.Nullable;
 import junit.framework.TestCase;
 
-import java.io.IOException;
 import java.time.Instant;
 
 /**
@@ -44,7 +41,7 @@ public class InterfaceTest extends TestCase {
     /**
      * Test the scheme generate following a scheme source, avaliable at http://json-schema.org/examples.html the output should match the example.
      */
-    public void testGenerateSchema() throws UnavailableVersion, JsonProcessingException, IOException {
+    public void testGenerateSchema() throws Exception {
 
         JsonNode fromJavaType = schemaFactory.createSchema(UserInterface.class);
         System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(fromJavaType));

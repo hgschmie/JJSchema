@@ -21,11 +21,9 @@ package com.github.reinert.jjschema.v1;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.reinert.jjschema.JsonSchema;
-import com.github.reinert.jjschema.exception.UnavailableVersion;
+import com.github.reinert.jjschema.annotations.JsonSchema;
 import junit.framework.TestCase;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +63,7 @@ public class EmployeeTest extends TestCase {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public void testEmployeeSchema() throws UnavailableVersion, IOException {
+    public void testEmployeeSchema() throws Exception {
         JsonNode employeeSchema = schemaFactory.createSchema(Employee.class);
         //System.out.println(ow.writeValueAsString(employeeSchema));
         String str = MAPPER.writeValueAsString(employeeSchema);

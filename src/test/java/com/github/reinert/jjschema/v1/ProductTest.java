@@ -21,13 +21,11 @@ package com.github.reinert.jjschema.v1;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.reinert.jjschema.JsonSchema;
-import com.github.reinert.jjschema.exception.UnavailableVersion;
+import com.github.reinert.jjschema.annotations.JsonSchema;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import junit.framework.TestCase;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.Iterator;
@@ -46,7 +44,7 @@ public class ProductTest extends TestCase {
     /**
      * Test the scheme generate following a scheme source, avaliable at http://json-schema.org/example1.html the output should match the example.
      */
-    public void testProductSchema() throws UnavailableVersion, IOException {
+    public void testProductSchema() throws Exception {
         JsonNode productSchema = schemaFactory.createSchema(Product.class);
 
         String expectedResult = CharStreams.toString(new InputStreamReader(

@@ -1,4 +1,4 @@
-package com.github.reinert.jjschema;
+package com.github.reinert.jjschema.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,9 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for the attributes of JSON Schema
- *
- * @author reinert
+ * Augments fields or properties with Json Format attributes.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.TYPE})

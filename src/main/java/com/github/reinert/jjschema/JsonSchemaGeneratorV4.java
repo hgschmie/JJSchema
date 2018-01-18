@@ -30,7 +30,6 @@ import com.github.reinert.jjschema.v1.SchemaWrapper;
  *
  * @author reinert
  */
-@Deprecated
 public class JsonSchemaGeneratorV4 extends JsonSchemaGenerator {
 
     JsonSchemaGeneratorV4(JsonSchemaGeneratorConfiguration config) {

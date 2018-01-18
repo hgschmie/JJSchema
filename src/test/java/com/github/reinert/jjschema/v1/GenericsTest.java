@@ -1,9 +1,7 @@
 package com.github.reinert.jjschema.v1;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.exception.UnavailableVersion;
 import junit.framework.TestCase;
 
 import java.io.IOException;
@@ -26,7 +24,7 @@ public class GenericsTest extends TestCase {
      * Test generating a json schema for a class that uses generic types and a collection of generic types as properties. Expect the types to be resolved
      * instead of using "object" as property types.
      */
-    public void testGenerateSchema() throws UnavailableVersion, JsonProcessingException, IOException {
+    public void testGenerateSchema() throws Exception {
 
         final InputStream in = SimpleExampleTest.class.getResourceAsStream("/generics_example.json");
         if (in == null) {

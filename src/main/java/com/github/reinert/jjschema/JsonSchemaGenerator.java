@@ -24,6 +24,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.annotations.Nullable;
+import com.github.reinert.jjschema.annotations.SchemaIgnore;
 import com.github.reinert.jjschema.exception.TypeException;
 
 import java.lang.reflect.AccessibleObject;
@@ -53,7 +55,6 @@ import java.util.Set;
  *
  * @author reinert
  */
-@Deprecated
 public abstract class JsonSchemaGenerator {
 
     private static final String TAG_PROPERTIES = "properties";
@@ -79,15 +80,15 @@ public abstract class JsonSchemaGenerator {
         return forwardReferences;
     }
 
-    <T> void pushForwardReference(ManagedReference forwardReference) {
+    void pushForwardReference(ManagedReference forwardReference) {
         getForwardReferences().add(forwardReference);
     }
 
-    <T> boolean isForwardReferencePiled(ManagedReference forwardReference) {
+    boolean isForwardReferencePiled(ManagedReference forwardReference) {
         return getForwardReferences().contains(forwardReference);
     }
 
-    <T> boolean pullForwardReference(ManagedReference forwardReference) {
+    boolean pullForwardReference(ManagedReference forwardReference) {
         return getForwardReferences().remove(forwardReference);
     }
 
@@ -98,33 +99,21 @@ public abstract class JsonSchemaGenerator {
         return backReferences;
     }
 
-    <T> void pushBackwardReference(ManagedReference backReference) {
+    void pushBackwardReference(ManagedReference backReference) {
         getBackwardReferences().add(backReference);
     }
 
-    <T> boolean isBackwardReferencePiled(ManagedReference backReference) {
+    boolean isBackwardReferencePiled(ManagedReference backReference) {
         return getBackwardReferences().contains(backReference);
     }
 
-    <T> boolean pullBackwardReference(ManagedReference backReference) {
+    boolean pullBackwardReference(ManagedReference backReference) {
         return getBackwardReferences().remove(backReference);
     }
-
-//    void resetProcessedReferences() {
-//    	processedReferences = null;
-//    }
-//    
-//    /**
-//     * Reset all utility fields used for generating schemas when asked by the user
-//     */
-//    void reset() {
-//    	resetProcessedReferences();
-//    }
 
     protected ObjectNode createRefSchema(String ref) {
         return createInstance().put("$ref", ref);
     }
-
 
     /**
      * Reads annotations and put its values into the generating schema. Usually, some verification is done for not putting the default values.
@@ -325,9 +314,7 @@ public abstract class JsonSchemaGenerator {
 
             if (!isForwardReferencePiled(forwardReference)) {
                 pushForwardReference(forwardReference);
-            } else
-//        	if (isBackwardReferencePiled(forwardReference))
-            {
+            } else {
                 pullForwardReference(forwardReference);
                 pullBackwardReference(forwardReference);
                 //return null;
@@ -354,8 +341,6 @@ public abstract class JsonSchemaGenerator {
                     !isBackwardReferencePiled(backReference)) {
                 pushBackwardReference(backReference);
             } else {
-//        		pullForwardReference(backReference);
-//        		pullBackwardReference(backReference);
                 return null;
             }
         }

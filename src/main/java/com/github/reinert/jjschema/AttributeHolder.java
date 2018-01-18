@@ -3,6 +3,7 @@ package com.github.reinert.jjschema;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.reinert.jjschema.annotations.JsonSchema;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 

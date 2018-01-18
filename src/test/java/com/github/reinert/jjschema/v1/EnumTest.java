@@ -20,8 +20,8 @@ package com.github.reinert.jjschema.v1;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.JsonSchema;
-import com.github.reinert.jjschema.Nullable;
+import com.github.reinert.jjschema.annotations.JsonSchema;
+import com.github.reinert.jjschema.annotations.Nullable;
 import junit.framework.TestCase;
 
 import java.io.IOException;

@@ -16,7 +16,7 @@
  * - ASL 2.0: http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package com.github.reinert.jjschema;
+package com.github.reinert.jjschema.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

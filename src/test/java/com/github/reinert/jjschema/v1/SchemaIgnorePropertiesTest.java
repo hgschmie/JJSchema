@@ -21,7 +21,7 @@ package com.github.reinert.jjschema.v1;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.SchemaIgnoreProperties;
+import com.github.reinert.jjschema.annotations.SchemaIgnoreProperties;
 import junit.framework.TestCase;
 
 /**

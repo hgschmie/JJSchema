@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.SchemaIgnore;
+import com.github.reinert.jjschema.annotations.SchemaIgnore;
 import junit.framework.TestCase;
 
 import java.util.List;
