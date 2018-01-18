@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.AttributeHolder;
 import com.github.reinert.jjschema.Attributes;
@@ -63,8 +64,8 @@ public class PropertyWrapper extends SchemaWrapper {
     ManagedReference managedReference;
     ReferenceType referenceType;
 
-    public PropertyWrapper(CustomSchemaWrapper ownerSchemaWrapper, Set<ManagedReference> managedReferences, Method method, Field field) {
-        super(null);
+    public PropertyWrapper(JsonNodeFactory nodeFactory, CustomSchemaWrapper ownerSchemaWrapper, Set<ManagedReference> managedReferences, Method method, Field field) {
+        super(nodeFactory, null);
 
         if (method == null)
             throw new RuntimeException("Error at " + ownerSchemaWrapper.getJavaType().getName() + ": Cannot instantiate a PropertyWrapper with a null method.");
@@ -106,12 +107,12 @@ public class PropertyWrapper extends SchemaWrapper {
         processReference(propertyType);
 
         if (shouldIgnoreField()) {
-            this.schemaWrapper = new EmptySchemaWrapper();
+            this.schemaWrapper = new EmptySchemaWrapper(nodeFactory);
         } else if (getReferenceType() == ReferenceType.BACKWARD) {
             SchemaWrapper schemaWrapperLocal;
             String id = processId(method.getReturnType());
             if (id != null) {
-                schemaWrapperLocal = new RefSchemaWrapper(propertyType, id);
+                schemaWrapperLocal = new RefSchemaWrapper(nodeFactory, propertyType, id);
                 ownerSchemaWrapper.pushReference(getManagedReference());
             } else {
                 if (ownerSchemaWrapper.pushReference(getManagedReference())) {
@@ -121,18 +122,18 @@ public class PropertyWrapper extends SchemaWrapper {
                     } else {
                         relativeId1 = relativeId1.substring(0, relativeId1.lastIndexOf("/") - (propertiesStr.length() - 1));
                     }
-                    schemaWrapperLocal = new RefSchemaWrapper(propertyType, relativeId1);
+                    schemaWrapperLocal = new RefSchemaWrapper(nodeFactory, propertyType, relativeId1);
                 } else
-                    schemaWrapperLocal = new EmptySchemaWrapper();
+                    schemaWrapperLocal = new EmptySchemaWrapper(nodeFactory);
             }
             if (schemaWrapperLocal.isRefWrapper() && collectionType != null)
-                this.schemaWrapper = SchemaWrapperFactory.createArrayRefWrapper((RefSchemaWrapper) schemaWrapperLocal);
+                this.schemaWrapper = SchemaWrapperFactory.createArrayRefWrapper(nodeFactory, (RefSchemaWrapper) schemaWrapperLocal);
             else
                 this.schemaWrapper = schemaWrapperLocal;
         } else if (ownerSchemaWrapper.getJavaType() == propertyType) {
-            SchemaWrapper schemaWrapperLocal = new RefSchemaWrapper(propertyType, ownerSchemaWrapper.getRelativeId());
+            SchemaWrapper schemaWrapperLocal = new RefSchemaWrapper(nodeFactory, propertyType, ownerSchemaWrapper.getRelativeId());
             if (collectionType != null) {
-                this.schemaWrapper = SchemaWrapperFactory.createArrayRefWrapper((RefSchemaWrapper) schemaWrapperLocal);
+                this.schemaWrapper = SchemaWrapperFactory.createArrayRefWrapper(nodeFactory, (RefSchemaWrapper) schemaWrapperLocal);
             } else {
                 this.schemaWrapper = schemaWrapperLocal;
             }
@@ -259,12 +260,12 @@ public class PropertyWrapper extends SchemaWrapper {
 
     protected SchemaWrapper createWrapper(Set<ManagedReference> managedReferences, Type genericType,
             String relativeId1) {
-        return SchemaWrapperFactory.createWrapper(genericType, managedReferences, relativeId1, shouldIgnoreProperties());
+        return SchemaWrapperFactory.createWrapper(getNodeFactory(), genericType, managedReferences, relativeId1, shouldIgnoreProperties());
     }
 
     protected SchemaWrapper createArrayWrapper(Set<ManagedReference> managedReferences, Type propertyType,
             Class<?> collectionType, String relativeId1) {
-        return SchemaWrapperFactory.createArrayWrapper(collectionType, propertyType, managedReferences, relativeId1, shouldIgnoreProperties());
+        return SchemaWrapperFactory.createArrayWrapper(getNodeFactory(), collectionType, propertyType, managedReferences, relativeId1, shouldIgnoreProperties());
     }
 
     protected void setRequired(boolean required) {

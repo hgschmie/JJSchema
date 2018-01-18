@@ -19,6 +19,7 @@
 package com.github.reinert.jjschema.v1;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import java.util.Collection;
 
@@ -30,12 +31,12 @@ public class CustomArraySchemaWrapper extends CustomSchemaWrapper {
 
     final SchemaWrapper itemsSchemaWrapper;
 
-    public CustomArraySchemaWrapper(Class<?> type, Class<?> parametrizedType) {
-        super(type);
+    public CustomArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, Class<?> parametrizedType) {
+        super(nodeFactory, type);
         if (parametrizedType != null) {
             if (!Collection.class.isAssignableFrom(type))
                 throw new RuntimeException("Cannot instantiate a SchemaWrapper of a non Collection class with a Parametrized Type.");
-            this.itemsSchemaWrapper = SchemaWrapperFactory.createWrapper(parametrizedType);
+            this.itemsSchemaWrapper = SchemaWrapperFactory.createWrapper(nodeFactory, parametrizedType);
         } else {
             this.itemsSchemaWrapper = null;
         }

@@ -19,6 +19,8 @@
 package com.github.reinert.jjschema.v1;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,6 +34,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 public abstract class JsonSchemaFactory {
 
     private boolean autoPutDollarSchema;
+
+    protected final JsonNodeFactory nodeFactory;
+
+    protected JsonSchemaFactory(JsonNodeFactory nodeFactory) {
+        this.nodeFactory = nodeFactory;
+    }
+
+    @VisibleForTesting
+    JsonSchemaFactory() {
+        this(JsonNodeFactory.instance);
+    }
 
     public abstract JsonNode createSchema(Class<?> type);
 

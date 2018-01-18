@@ -20,6 +20,7 @@ package com.github.reinert.jjschema.v1;
 
 import java.lang.reflect.Type;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.reinert.jjschema.SimpleTypeMappings;
 
 /**
@@ -28,8 +29,8 @@ import com.github.reinert.jjschema.SimpleTypeMappings;
 
 public class SimpleSchemaWrapper extends SchemaWrapper {
 
-    public SimpleSchemaWrapper(Type type) {
-        super(type);
+    public SimpleSchemaWrapper(JsonNodeFactory nodeFactory, Type type) {
+        super(nodeFactory, type);
         setType(SimpleTypeMappings.forClass(type));
         processNullable();
     }

@@ -18,18 +18,20 @@
 
 package com.github.reinert.jjschema.v1;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
 /**
  * @author Danilo Reinert
  */
 
 public class EmptySchemaWrapper extends SchemaWrapper {
 
-    public EmptySchemaWrapper(Class<?> type) {
-        super(type);
+    public EmptySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type) {
+        super(nodeFactory, type);
     }
 
-    public EmptySchemaWrapper() {
-        super(null);
+    public EmptySchemaWrapper(JsonNodeFactory nodeFactory) {
+        super(nodeFactory, null);
     }
 
     @Override

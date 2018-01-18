@@ -18,6 +18,8 @@
 
 package com.github.reinert.jjschema.v1;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
 import java.lang.reflect.Type;
 
 /**
@@ -26,8 +28,8 @@ import java.lang.reflect.Type;
 
 public class NullSchemaWrapper extends SchemaWrapper {
 
-    public NullSchemaWrapper(Type type) {
-        super(type);
+    public NullSchemaWrapper(JsonNodeFactory nodeFactory, Type type) {
+        super(nodeFactory, type);
         setType("null");
     }
 

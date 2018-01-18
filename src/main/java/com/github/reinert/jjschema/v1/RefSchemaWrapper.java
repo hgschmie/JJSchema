@@ -18,6 +18,8 @@
 
 package com.github.reinert.jjschema.v1;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
 import java.lang.reflect.Type;
 
 /**
@@ -26,13 +28,13 @@ import java.lang.reflect.Type;
 
 public class RefSchemaWrapper extends SchemaWrapper {
 
-    public RefSchemaWrapper(Class<?> type) {
-        super(type);
+    public RefSchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type) {
+        super(nodeFactory, type);
         setRef("#");
     }
 
-    public RefSchemaWrapper(Type propertyType, String ref) {
-        super(propertyType);
+    public RefSchemaWrapper(JsonNodeFactory nodeFactory, Type propertyType, String ref) {
+        super(nodeFactory, propertyType);
         setRef(ref);
     }
 

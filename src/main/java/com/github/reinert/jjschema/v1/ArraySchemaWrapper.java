@@ -19,6 +19,7 @@
 package com.github.reinert.jjschema.v1;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.reinert.jjschema.ManagedReference;
 
 import java.lang.reflect.Type;
@@ -33,32 +34,32 @@ public class ArraySchemaWrapper extends SchemaWrapper {
 
     final SchemaWrapper itemsSchemaWrapper;
 
-    public ArraySchemaWrapper(Class<?> type, Type propertyType, Set<ManagedReference> managedReferences, String relativeId, boolean ignoreProperties) {
-        super(type);
+    public ArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, Type propertyType, Set<ManagedReference> managedReferences, String relativeId, boolean ignoreProperties) {
+        super(nodeFactory, type);
         setType("array");
         if (propertyType != null) {
             if (!Collection.class.isAssignableFrom(type))
                 throw new RuntimeException("Cannot instantiate a SchemaWrapper of a non Collection class with a Parametrized Type.");
             if (managedReferences == null)
-                this.itemsSchemaWrapper = SchemaWrapperFactory.createWrapper(propertyType);
+                this.itemsSchemaWrapper = SchemaWrapperFactory.createWrapper(nodeFactory, propertyType);
             else
-                this.itemsSchemaWrapper = SchemaWrapperFactory.createWrapper(propertyType, managedReferences, relativeId, ignoreProperties);
+                this.itemsSchemaWrapper = SchemaWrapperFactory.createWrapper(nodeFactory, propertyType, managedReferences, relativeId, ignoreProperties);
             setItems(this.itemsSchemaWrapper.asJson());
         } else {
             this.itemsSchemaWrapper = null;
         }
     }
 
-    public ArraySchemaWrapper(Class<?> type, Class<?> parametrizedType, Set<ManagedReference> managedReferences, boolean ignoreProperties) {
-        this(type, parametrizedType, managedReferences, null, ignoreProperties);
+    public ArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, Class<?> parametrizedType, Set<ManagedReference> managedReferences, boolean ignoreProperties) {
+        this(nodeFactory, type, parametrizedType, managedReferences, null, ignoreProperties);
     }
 
-    public ArraySchemaWrapper(Class<?> type, Class<?> parametrizedType, boolean ignoreProperties) {
-        this(type, parametrizedType, null, ignoreProperties);
+    public ArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, Class<?> parametrizedType, boolean ignoreProperties) {
+        this(nodeFactory, type, parametrizedType, null, ignoreProperties);
     }
 
-    public ArraySchemaWrapper(Class<?> type, RefSchemaWrapper refSchemaWrapper) {
-        super(type);
+    public ArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, RefSchemaWrapper refSchemaWrapper) {
+        super(nodeFactory,  type);
         setType("array");
         this.itemsSchemaWrapper = refSchemaWrapper;
         setItems(this.itemsSchemaWrapper.asJson());

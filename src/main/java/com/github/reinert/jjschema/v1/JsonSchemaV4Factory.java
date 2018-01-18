@@ -19,6 +19,7 @@
 package com.github.reinert.jjschema.v1;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,7 +34,7 @@ public class JsonSchemaV4Factory extends JsonSchemaFactory {
 
     @Override
     public JsonNode createSchema(Class<?> type) {
-        SchemaWrapper schemaWrapper = SchemaWrapperFactory.createWrapper(type);
+        SchemaWrapper schemaWrapper = SchemaWrapperFactory.createWrapper(nodeFactory, type);
         if (isAutoPutDollarSchema())
             schemaWrapper.putDollarSchema();
         return schemaWrapper.asJson();

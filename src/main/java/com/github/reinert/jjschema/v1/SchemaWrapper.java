@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.Nullable;
 
@@ -32,15 +33,23 @@ import com.github.reinert.jjschema.Nullable;
 
 public abstract class SchemaWrapper {
     private final Type type;
-    private final ObjectNode node = SchemaWrapperFactory.MAPPER.createObjectNode();
+    private final JsonNodeFactory nodeFactory;
+    private final ObjectNode node;
     public static final String DRAFT_04 = "http://json-schema.org/draft-04/schema#";
 
-    public SchemaWrapper(Type type) {
+    public SchemaWrapper(JsonNodeFactory nodeFactory, Type type) {
+        this.nodeFactory = nodeFactory;
         this.type = type;
+
+        this.node = nodeFactory.objectNode();
     }
 
     public JsonNode asJson() {
         return node;
+    }
+
+    protected JsonNodeFactory getNodeFactory() {
+        return nodeFactory;
     }
 
     public String getDollarSchema() {

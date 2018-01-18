@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for mediaType and binaryEnconding attributes of JSON Hyper-Schema
+ * Annotation for mediaType and binaryEncoding attributes of JSON Hyper-Schema
  *
  * @author reinert
  */

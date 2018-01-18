@@ -19,6 +19,7 @@
 package com.github.reinert.jjschema.v1;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.reinert.jjschema.Nullable;
 
 import java.math.BigDecimal;
@@ -29,8 +30,8 @@ import java.math.BigDecimal;
 
 public class EnumSchemaWrapper extends SchemaWrapper {
 
-    public <T> EnumSchemaWrapper(Class<T> type) {
-        super(type);
+    public <T> EnumSchemaWrapper(JsonNodeFactory nodeFactory, Class<T> type) {
+        super(nodeFactory, type);
         processEnum(type);
         processNullable();
     }

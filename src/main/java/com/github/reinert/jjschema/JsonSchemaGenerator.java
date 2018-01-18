@@ -21,8 +21,8 @@ package com.github.reinert.jjschema;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.exception.TypeException;
 
@@ -61,13 +61,14 @@ public abstract class JsonSchemaGenerator {
     private static final String TAG_TYPE = "type";
     private static final String TAG_ARRAY = "array";
     
-    final ObjectMapper mapper = new ObjectMapper();
     private Set<ManagedReference> forwardReferences;
     private Set<ManagedReference> backReferences;
 
+    protected final JsonNodeFactory nodeFactory;
     protected final JsonSchemaGeneratorConfiguration config;
     
     protected JsonSchemaGenerator(JsonSchemaGeneratorConfiguration config) {
+        this.nodeFactory = config.nodeFactory();
         this.config = config;
     }
 
@@ -133,7 +134,7 @@ public abstract class JsonSchemaGenerator {
     protected abstract void processSchemaProperty(ObjectNode schema, AttributeHolder attributeHolder);
 
     protected ObjectNode createInstance() {
-        return mapper.createObjectNode();
+        return nodeFactory.objectNode();
     }
 
     public <T> ObjectNode generateSchema(Class<T> type) throws TypeException {

@@ -19,6 +19,9 @@
 package com.github.reinert.jjschema;
 
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public final class SchemaGeneratorBuilder {
@@ -27,20 +30,21 @@ public final class SchemaGeneratorBuilder {
     }
 
     public static JsonSchemaGeneratorConfigurationBuilder draftV4Schema() {
-        return new JsonSchemaGeneratorConfigurationBuilder((config -> new JsonSchemaGeneratorV4(config)));
+        return new JsonSchemaGeneratorConfigurationBuilder(JsonNodeFactory.instance, config -> new JsonSchemaGeneratorV4(config));
     }
 
     public static JsonSchemaGeneratorConfigurationBuilder draftV4HyperSchema() {
-        return new JsonSchemaGeneratorConfigurationBuilder((config -> new HyperSchemaGeneratorV4(new JsonSchemaGeneratorV4(config))));
+        return new JsonSchemaGeneratorConfigurationBuilder(JsonNodeFactory.instance, config -> new HyperSchemaGeneratorV4(new JsonSchemaGeneratorV4(config)));
     }
 
     public static class JsonSchemaGeneratorConfigurationBuilder {
 
         private final Function<JsonSchemaGeneratorConfiguration, JsonSchemaGenerator> factory;
-        private final JsonSchemaGeneratorConfiguration.Builder builder = JsonSchemaGeneratorConfiguration.builder();
+        private final JsonSchemaGeneratorConfiguration.Builder builder;
 
-        JsonSchemaGeneratorConfigurationBuilder(Function<JsonSchemaGeneratorConfiguration, JsonSchemaGenerator> factory) {
+        JsonSchemaGeneratorConfigurationBuilder(JsonNodeFactory nodeFactory, Function<JsonSchemaGeneratorConfiguration, JsonSchemaGenerator> factory) {
             this.factory = factory;
+            this.builder = JsonSchemaGeneratorConfiguration.builder().customNodeFactory(nodeFactory);
         }
 
         public JsonSchemaGeneratorConfigurationBuilder removeSchemaVersion() {

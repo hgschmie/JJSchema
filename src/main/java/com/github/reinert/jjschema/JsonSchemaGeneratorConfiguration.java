@@ -1,13 +1,22 @@
 package com.github.reinert.jjschema;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
 public abstract class JsonSchemaGeneratorConfiguration {
 
     public static Builder builder() {
-        return new AutoValue_JsonSchemaGeneratorConfiguration.Builder();
+        return new AutoValue_JsonSchemaGeneratorConfiguration.Builder()
+                .setNodeFactory(JsonNodeFactory.instance)
+                .setSortSchemaProperties(true)
+                .setAddSchemaVersion(true)
+                .setProcessAnnotatedOnly(false)
+                .setProcessPropertiesOnly(false)
+                .setProcessFieldsOnly(false);
     }
+
+    public abstract JsonNodeFactory nodeFactory();
 
     public abstract boolean addSchemaVersion();
 
@@ -22,13 +31,7 @@ public abstract class JsonSchemaGeneratorConfiguration {
     @AutoValue.Builder
     public abstract static class Builder {
 
-        public Builder() {
-            setSortSchemaProperties(true);
-            setAddSchemaVersion(true);
-            setProcessAnnotatedOnly(false);
-            setProcessPropertiesOnly(false);
-            setProcessFieldsOnly(false);
-        }
+        abstract Builder setNodeFactory(JsonNodeFactory nodeFactory);
 
         abstract Builder setAddSchemaVersion(boolean addSchemaVersion);
 
@@ -58,6 +61,10 @@ public abstract class JsonSchemaGeneratorConfiguration {
 
         public Builder processPropertiesOnly() {
             return setProcessPropertiesOnly(true);
+        }
+
+        public Builder customNodeFactory(JsonNodeFactory nodeFactory) {
+            return setNodeFactory(nodeFactory);
         }
 
         public abstract JsonSchemaGeneratorConfiguration build();

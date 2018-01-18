@@ -21,6 +21,7 @@ package com.github.reinert.jjschema.v1;
 import static com.github.reinert.jjschema.JJSchemaUtil.processCommonAttributes;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.AttributeHolder;
 import com.github.reinert.jjschema.ManagedReference;
@@ -57,20 +58,20 @@ public class CustomSchemaWrapper extends SchemaWrapper implements Iterable<Prope
     private final Set<ManagedReference> managedReferences;
     private String relativeId = "#";
 
-    public CustomSchemaWrapper(Type type) {
-        this(type, false);
+    public CustomSchemaWrapper(JsonNodeFactory nodeFactory, Type type) {
+        this(nodeFactory, type, false);
     }
 
-    public CustomSchemaWrapper(Type type, boolean ignoreProperties) {
-        this(type, new HashSet<ManagedReference>(), null, ignoreProperties);
+    public CustomSchemaWrapper(JsonNodeFactory nodeFactory, Type type, boolean ignoreProperties) {
+        this(nodeFactory, type, new HashSet<ManagedReference>(), null, ignoreProperties);
     }
 
-    public CustomSchemaWrapper(Type type, Set<ManagedReference> managedReferences, boolean ignoreProperties) {
-        this(type, managedReferences, null, ignoreProperties);
+    public CustomSchemaWrapper(JsonNodeFactory nodeFactory, Type type, Set<ManagedReference> managedReferences, boolean ignoreProperties) {
+        this(nodeFactory, type, managedReferences, null, ignoreProperties);
     }
 
-    public CustomSchemaWrapper(Type type, Set<ManagedReference> managedReferences, String relativeId, boolean ignoreProperties) {
-        super(type);
+    public CustomSchemaWrapper(JsonNodeFactory nodeFactory, Type type, Set<ManagedReference> managedReferences, String relativeId, boolean ignoreProperties) {
+        super(nodeFactory, type);
         setType("object");
         processNullable();
         processAttributes(getNode(), type);
@@ -157,7 +158,7 @@ public class CustomSchemaWrapper extends SchemaWrapper implements Iterable<Prope
     protected void processProperties() {
         HashMap<Method, Field> properties = findProperties();
         for (Entry<Method, Field> prop : properties.entrySet()) {
-            PropertyWrapper propertyWrapper = new PropertyWrapper(this, managedReferences,
+            PropertyWrapper propertyWrapper = new PropertyWrapper(getNodeFactory(), this, managedReferences,
                     prop.getKey(), prop.getValue());
             if (!propertyWrapper.isEmptyWrapper()) {
                 addProperty(propertyWrapper);

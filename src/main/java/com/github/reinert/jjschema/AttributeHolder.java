@@ -46,7 +46,13 @@ public abstract class AttributeHolder {
     }
 
     public static Builder builder() {
-        return new AutoValue_AttributeHolder.Builder();
+        return new AutoValue_AttributeHolder.Builder()
+                .exclusiveMaximum(false)
+                .exclusiveMinimum(false)
+                .required(false)
+                .uniqueItems(false)
+                .readonly(false)
+                .additionalProperties(true);
     }
 
     public abstract Optional<String> $ref();
