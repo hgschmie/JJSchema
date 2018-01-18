@@ -52,18 +52,13 @@ public final class SchemaGeneratorBuilder {
             return this;
         }
 
-        public JsonSchemaGeneratorConfigurationBuilder processAnnotatedOnly() {
-            builder.processAnnotatedOnly();
+        public JsonSchemaGeneratorConfigurationBuilder dontProcessProperties() {
+            builder.dontProcessProperties();
             return this;
         }
 
-        public JsonSchemaGeneratorConfigurationBuilder processPropertiesOnly() {
-            builder.processPropertiesOnly();
-            return this;
-        }
-
-        public JsonSchemaGeneratorConfigurationBuilder processFieldsOnly() {
-            builder.processFieldsOnly();
+        public JsonSchemaGeneratorConfigurationBuilder processFields() {
+            builder.processFields();
             return this;
         }
 

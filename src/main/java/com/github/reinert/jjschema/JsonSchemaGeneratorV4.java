@@ -37,11 +37,11 @@ public class JsonSchemaGeneratorV4 extends JsonSchemaGenerator {
     }
 
     @Override
-    protected void processSchemaProperty(ObjectNode schema, AttributeHolder attributeHolder) {
+    protected void processSchemaProperty(ObjectNode schema, AttributeHolder attributeHolder, boolean isRoot) {
         checkNotNull(attributeHolder, "attributeHolder is null");
         attributeHolder.$ref().ifPresent($ref -> schema.put("$ref", $ref));
 
-        if (config.addSchemaVersion()) {
+        if (isRoot && config.addSchemaVersion()) {
             schema.put("$schema", SchemaWrapper.DRAFT_04);
         }
         processCommonAttributes(schema, attributeHolder);

@@ -4,6 +4,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.reinert.jjschema.annotations.JsonSchema;
+import com.github.reinert.jjschema.annotations.Nullable;
+import com.github.reinert.jjschema.annotations.SchemaIgnore;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 
@@ -31,9 +33,23 @@ public abstract class AttributeHolder {
         }
 
         final JsonProperty jsonProperty = element.getAnnotation(JsonProperty.class);
-        if (jsonProperty != null && jsonProperty.required()) {
-            builder.required(true);
+        if (jsonProperty != null) {
             foundAnnotations = true;
+            if (jsonProperty.required()) {
+                builder.required(true);
+            }
+        }
+
+        final SchemaIgnore schemaIgnore = element.getAnnotation(SchemaIgnore.class);
+        if (schemaIgnore != null) {
+            foundAnnotations = true;
+            builder.ignored(true);
+        }
+
+        final Nullable nullable = element.getAnnotation(Nullable.class);
+        if (nullable != null) {
+            foundAnnotations = true;
+            builder.nullable(true);
         }
 
         return foundAnnotations ? Optional.of(builder.build()) : Optional.empty();
@@ -46,7 +62,9 @@ public abstract class AttributeHolder {
                 .required(false)
                 .uniqueItems(false)
                 .readonly(false)
-                .additionalProperties(true);
+                .additionalProperties(true)
+                .ignored(false)
+                .nullable(false);
     }
 
     public abstract Optional<String> $ref();
@@ -88,6 +106,10 @@ public abstract class AttributeHolder {
     public abstract boolean readonly();
 
     public abstract boolean additionalProperties();
+
+    public abstract boolean ignored();
+
+    public abstract boolean nullable();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -136,6 +158,10 @@ public abstract class AttributeHolder {
         public abstract Builder readonly(boolean readOnly);
 
         public abstract Builder additionalProperties(boolean additionalProperties);
+
+        public abstract Builder ignored(boolean ignored);
+
+        public abstract Builder nullable(boolean nullable);
 
         public abstract AttributeHolder build();
 

@@ -18,16 +18,25 @@
 
 package com.github.reinert.jjschema;
 
+import static com.google.common.base.Preconditions.checkState;
+import static java.lang.String.format;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.reinert.jjschema.annotations.Nullable;
 import com.github.reinert.jjschema.annotations.SchemaIgnore;
 import com.github.reinert.jjschema.exception.TypeException;
+import com.google.common.reflect.TypeToken;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -40,15 +49,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Generates JSON schema from Java Types
@@ -57,13 +67,8 @@ import java.util.Set;
  */
 public abstract class JsonSchemaGenerator {
 
-    private static final String TAG_PROPERTIES = "properties";
-    private static final String TAG_REQUIRED = "required";
-    private static final String TAG_TYPE = "type";
-    private static final String TAG_ARRAY = "array";
-
-    private Set<ManagedReference> forwardReferences;
-    private Set<ManagedReference> backReferences;
+    private final Set<ManagedReference> forwardReferences = new LinkedHashSet<>();
+    private final Set<ManagedReference> backReferences = new LinkedHashSet<>();
 
     protected final JsonNodeFactory nodeFactory;
     protected final JsonSchemaGeneratorConfiguration config;
@@ -73,41 +78,35 @@ public abstract class JsonSchemaGenerator {
         this.config = config;
     }
 
-    Set<ManagedReference> getForwardReferences() {
-        if (forwardReferences == null) {
-            forwardReferences = new LinkedHashSet<ManagedReference>();
-        }
+    private Set<ManagedReference> getForwardReferences() {
         return forwardReferences;
     }
 
-    void pushForwardReference(ManagedReference forwardReference) {
+    private void pushForwardReference(ManagedReference forwardReference) {
         getForwardReferences().add(forwardReference);
     }
 
-    boolean isForwardReferencePiled(ManagedReference forwardReference) {
+    private boolean isForwardReferencePiled(ManagedReference forwardReference) {
         return getForwardReferences().contains(forwardReference);
     }
 
-    boolean pullForwardReference(ManagedReference forwardReference) {
+    private boolean pullForwardReference(ManagedReference forwardReference) {
         return getForwardReferences().remove(forwardReference);
     }
 
-    Set<ManagedReference> getBackwardReferences() {
-        if (backReferences == null) {
-            backReferences = new LinkedHashSet<ManagedReference>();
-        }
+    private Set<ManagedReference> getBackwardReferences() {
         return backReferences;
     }
 
-    void pushBackwardReference(ManagedReference backReference) {
+    private void pushBackwardReference(ManagedReference backReference) {
         getBackwardReferences().add(backReference);
     }
 
-    boolean isBackwardReferencePiled(ManagedReference backReference) {
+    private boolean isBackwardReferencePiled(ManagedReference backReference) {
         return getBackwardReferences().contains(backReference);
     }
 
-    boolean pullBackwardReference(ManagedReference backReference) {
+    private boolean pullBackwardReference(ManagedReference backReference) {
         return getBackwardReferences().remove(backReference);
     }
 
@@ -118,16 +117,15 @@ public abstract class JsonSchemaGenerator {
     /**
      * Reads annotations and put its values into the generating schema. Usually, some verification is done for not putting the default values.
      */
-    protected abstract void processSchemaProperty(ObjectNode schema, AttributeHolder attributeHolder);
+    protected abstract void processSchemaProperty(ObjectNode schema, AttributeHolder attributeHolder, boolean isRoot);
 
     protected ObjectNode createInstance() {
         return nodeFactory.objectNode();
     }
 
-    public <T> ObjectNode generateSchema(Class<T> type) throws TypeException {
+    public <T> Optional<ObjectNode> generateSchema(Class<T> type) {
         ObjectNode schema = createInstance();
-        schema = checkAndProcessType(type, schema);
-        return schema;
+        return checkAndProcessType(type, schema);
     }
 
     /**
@@ -136,16 +134,16 @@ public abstract class JsonSchemaGenerator {
      *
      * @return the full schema represented as an ObjectNode.
      */
-    protected <T> ObjectNode checkAndProcessType(Class<T> type, ObjectNode schema) throws TypeException {
+    protected <T> Optional<ObjectNode> checkAndProcessType(Class<T> type, ObjectNode schema) {
         String s = SimpleTypeMappings.forClass(type);
         // If it is a simple type, then just put the type
         if (s != null) {
-            schema.put(TAG_TYPE, s);
+            schema.put("type", s);
         }
         // If it is a Collection or Iterable the generate the schema as an array
         else if (Iterable.class.isAssignableFrom(type)
                 || Collection.class.isAssignableFrom(type)) {
-            checkAndProcessCollection(type, schema);
+            checkAndProcessArrayType(type, schema);
         }
         // If it is void then return null
         else if (type == Void.class || type == void.class) {
@@ -159,7 +157,7 @@ public abstract class JsonSchemaGenerator {
         else {
             schema = processCustomType(type, schema);
         }
-        return schema;
+        return Optional.ofNullable(schema);
     }
 
     /**
@@ -167,20 +165,18 @@ public abstract class JsonSchemaGenerator {
      *
      * @return the full schema of custom java types
      */
-    protected <T> ObjectNode processCustomType(Class<T> type, ObjectNode schema) throws TypeException {
-        schema.put(TAG_TYPE, "object");
+    protected <T> ObjectNode processCustomType(Class<T> type, ObjectNode schema) {
+        schema.put("type", "object");
         // fill root object properties
-        processRootAttributes(type, schema);
+        processRootAttributes(type, schema, true);
 
-        if (config.processFieldsOnly()) {
-            // Process fields only
-            processFields(type, schema);
-        } else {
-            // Generate the schemas of type's properties
+        if (config.processProperties()) {
             processProperties(type, schema);
         }
-        // Merge the actual type's schema with a parent type's schema (if it exists!)
-        schema = mergeWithParent(type, schema);
+
+        if (config.processFields()) {
+            processFields(type, schema);
+        }
 
         return schema;
     }
@@ -188,30 +184,9 @@ public abstract class JsonSchemaGenerator {
     /**
      * Generates the schema of collections java types
      */
-    private <T> void checkAndProcessCollection(Class<T> type, ObjectNode schema) throws TypeException {
-        // If the type extends from AbstracctCollection, then it is considered
-        // as a simple array type
-        if (AbstractCollection.class.isAssignableFrom(type)) {
-            schema.put(TAG_TYPE, TAG_ARRAY);
-        }
-        // Otherwise it is processed as a custom array type
-        else {
-            processRootAttributes(type, schema);
-            // NOTE: Customized Iterable/Collection Wrapper Class must declare
-            // the intended Collection as the first field
-            processCustomCollection(type, schema);
-        }
-    }
-
-    private <T> void processCustomCollection(Class<T> type, ObjectNode schema) throws TypeException {
-        schema.put(TAG_TYPE, TAG_ARRAY);
-        Field field = type.getDeclaredFields()[0];
-        ParameterizedType genericType = (ParameterizedType) field
-                .getGenericType();
-        Class<?> genericClass = (Class<?>) genericType.getActualTypeArguments()[0];
-        ObjectNode itemsSchema = generateSchema(genericClass);
-        itemsSchema.remove("$schema");
-        schema.put("items", itemsSchema);
+    private <T> void checkAndProcessArrayType(Class<T> type, ObjectNode schema) {
+        // missing out on any item references. Needs to be fixed.
+        schema.put("type", "array");
     }
 
     private <T> void processEnum(Class<T> type, ObjectNode schema) {
@@ -238,51 +213,43 @@ public abstract class JsonSchemaGenerator {
         }
     }
 
-    private void processPropertyCollection(Method method, Field field, ObjectNode schema) throws TypeException {
-        schema.put(TAG_TYPE, TAG_ARRAY);
-        Class<?> genericClass = null;
-        if (method != null) {
-            Type methodType = method.getGenericReturnType();
-            if (!ParameterizedType.class.isAssignableFrom(methodType.getClass())) {
-                throw new TypeException("Collection property must be parameterized: " + method.getName());
-            }
-            ParameterizedType genericType = (ParameterizedType) methodType;
-            genericClass = (Class<?>) genericType.getActualTypeArguments()[0];
-        } else {
-            genericClass = field.getClass();
+    private void processPropertyCollection(Method method, ObjectNode schema) {
+        schema.put("type", "array");
+        Type methodType = method.getGenericReturnType();
+        if (!ParameterizedType.class.isAssignableFrom(methodType.getClass())) {
+            throw new IllegalStateException("Collection property must be parameterized: " + method.getName());
         }
-        schema.put("items", generateSchema(genericClass));
+        ParameterizedType genericType = (ParameterizedType) methodType;
+        checkState(genericType.getActualTypeArguments().length > 0,
+                "No type arguments in return type of %s found!", method.getName());
+        Class<?> genericClass = (Class<?>) genericType.getActualTypeArguments()[0];
+        generateSchema(genericClass).ifPresent(objectNode -> schema.set("items", objectNode));
     }
 
-    protected <T> void processRootAttributes(Class<T> type, ObjectNode schema) {
+    protected <T> void processRootAttributes(Class<T> type, ObjectNode schema, boolean isRoot) {
         Optional<AttributeHolder> rootAttributes = AttributeHolder.locate(type);
-        rootAttributes.ifPresent(attributeHolder -> processSchemaProperty(schema, attributeHolder));
+        rootAttributes.ifPresent(attributeHolder -> processSchemaProperty(schema, attributeHolder, isRoot));
     }
 
-    protected <T> void processProperties(Class<T> type, ObjectNode schema) throws TypeException {
-        HashMap<Method, Field> props = findProperties(type);
-        for (Map.Entry<Method, Field> entry : props.entrySet()) {
-            Field field = entry.getValue();
-            Method method = entry.getKey();
-            ObjectNode prop = generatePropertySchema(type, method, field);
-            if (prop != null && field != null) {
-                addPropertyToSchema(schema, field, method, prop);
-            }
+    protected <T> void processProperties(Class<T> type, ObjectNode schema) {
+        Map<String, ObjectNode> methodSchemaProperties = findSchemaPropertiesFromMethods(type);
+        for (Map.Entry<String, ObjectNode> entry : methodSchemaProperties.entrySet()) {
+            String fieldName = entry.getKey();
+            ObjectNode objectNode = entry.getValue();
+            addPropertyToSchema(schema, fieldName, objectNode);
         }
     }
 
-    protected <T> void processFields(Class<T> type, ObjectNode schema) throws TypeException {
-        List<Field> props = findFields(type);
-
-        for (Field field : props) {
-            ObjectNode prop = generatePropertySchema(type, null, field);
-            if (prop != null && field != null) {
-                addPropertyToSchema(schema, field, null, prop);
-            }
+    protected <T> void processFields(Class<T> type, ObjectNode schema) {
+        Map<String, ObjectNode> fieldSchemaProperties = findSchemaPropertiesFromFields(type);
+        for (Map.Entry<String, ObjectNode> entry : fieldSchemaProperties.entrySet()) {
+            String fieldName = entry.getKey();
+            ObjectNode objectNode = entry.getValue();
+            addPropertyToSchema(schema, fieldName, objectNode);
         }
     }
 
-    protected <T> ObjectNode generatePropertySchema(Class<T> type, Method method, Field field) throws TypeException {
+    protected <T> ObjectNode generatePropertySchema(Class<T> type, Method method, Field field) {
         Class<?> returnType = method != null ? method.getReturnType() : field.getType();
 
         AccessibleObject propertyReflection = field != null ? field : method;
@@ -346,7 +313,7 @@ public abstract class JsonSchemaGenerator {
         }
 
         if (Collection.class.isAssignableFrom(returnType)) {
-            processPropertyCollection(method, field, schema);
+            processPropertyCollection(method, schema);
         } else {
             schema = generateSchema(returnType);
         }
@@ -357,9 +324,7 @@ public abstract class JsonSchemaGenerator {
 
         Optional<AttributeHolder> fieldAttributes = AttributeHolder.locate(propertyReflection);
         if (fieldAttributes.isPresent()) {
-            processSchemaProperty(schema, fieldAttributes.get());
-            // The declaration of $schema is only necessary at the root object
-            schema.remove("$schema");
+            processSchemaProperty(schema, fieldAttributes.get(), false);
         }
 
         // Check if the Nullable annotation is present, and if so, add 'null' to type attr
@@ -368,8 +333,8 @@ public abstract class JsonSchemaGenerator {
             if (returnType.isEnum()) {
                 ((ArrayNode) schema.get("enum")).add("null");
             } else {
-                String oldType = schema.get(TAG_TYPE).asText();
-                ArrayNode typeArray = schema.putArray(TAG_TYPE);
+                String oldType = schema.get("type").asText();
+                ArrayNode typeArray = schema.putArray("type");
                 typeArray.add(oldType);
                 typeArray.add("null");
             }
@@ -378,158 +343,174 @@ public abstract class JsonSchemaGenerator {
         return schema;
     }
 
-    private void addPropertyToSchema(ObjectNode schema, Field field,
-            Method method, ObjectNode prop) {
+    private void addPropertyToSchema(ObjectNode schema, String name, ObjectNode property) {
 
-        String name = getPropertyName(field, method);
-        if (prop.has("selfRequired")) {
-            ArrayNode requiredNode;
-            if (!schema.has(TAG_REQUIRED)) {
-                requiredNode = schema.putArray(TAG_REQUIRED);
-            } else {
-                requiredNode = (ArrayNode) schema.get(TAG_REQUIRED);
-            }
-            requiredNode.add(name);
-            prop.remove("selfRequired");
+        if (property.has("selfRequired")) {
+            addToRequired(schema, name);
+            property.remove("selfRequired");
         }
-        if (!schema.has(TAG_PROPERTIES)) {
-            schema.putObject(TAG_PROPERTIES);
-        }
-        ((ObjectNode) schema.get(TAG_PROPERTIES)).put(name, prop);
+
+        addToProperties(schema, name, property);
     }
 
-    private String getPropertyName(Field field, Method method) {
-        return (field == null) ? firstToLowCase(method.getName()
-                .replace("get", "")) : field.getName();
-    }
-
-    /**
-     * If the Java Type inherits from other Java Type but Object, then it is assumed to inherit from other custom type. In this case, the parent class is
-     * processed as well and merged with the child class, having the child a high priority when both have same attributes filled.
-     *
-     * @return The actual schema merged with its parent schema (if it exists)
-     */
-    protected <T> ObjectNode mergeWithParent(Class<T> type, ObjectNode schema) throws TypeException {
-        Class<? super T> superclass = type.getSuperclass();
-        if (superclass != null && superclass != Object.class) {
-            ObjectNode parentSchema = generateSchema(superclass);
-            schema = mergeSchema(parentSchema, schema, false);
-        }
-        return schema;
-    }
-
-    /**
-     * Merges two schemas.
-     *
-     * @param parent A parent schema considering inheritance
-     * @param child A child schema considering inheritance
-     * @param overwriteChildProperties A boolean to check whether properties (from parent or child) must have higher priority
-     * @return The tow schemas merged
-     */
-    protected ObjectNode mergeSchema(ObjectNode parent, ObjectNode child,
-            boolean overwriteChildProperties) {
-        Iterator<String> namesIterator = child.fieldNames();
-
-        if (overwriteChildProperties) {
-            while (namesIterator.hasNext()) {
-                String propertyName = namesIterator.next();
-                overwriteProperty(parent, child, propertyName);
-            }
-
+    private void addToRequired(ObjectNode schema, String name) {
+        ArrayNode requiredNode;
+        if (schema.has("required")) {
+            requiredNode = (ArrayNode) schema.get("required");
         } else {
-
-            while (namesIterator.hasNext()) {
-                String propertyName = namesIterator.next();
-                if (!TAG_PROPERTIES.equals(propertyName)) {
-                    overwriteProperty(parent, child, propertyName);
-                }
-            }
-
-            ObjectNode properties = (ObjectNode) child.get(TAG_PROPERTIES);
-            if (properties != null) {
-                if (parent.get(TAG_PROPERTIES) == null) {
-                    parent.putObject(TAG_PROPERTIES);
-                }
-
-                Iterator<Entry<String, JsonNode>> it = properties.fields();
-                while (it.hasNext()) {
-                    Entry<String, JsonNode> entry = it.next();
-                    String pName = entry.getKey();
-                    ObjectNode pSchema = (ObjectNode) entry.getValue();
-                    ObjectNode actualSchema = (ObjectNode) parent.get(
-                            TAG_PROPERTIES).get(pName);
-                    if (actualSchema != null) {
-                        mergeSchema(pSchema, actualSchema, false);
-                    }
-                    ((ObjectNode) parent.get(TAG_PROPERTIES)).put(pName, pSchema);
-                }
-            }
+            requiredNode = schema.putArray("required");
         }
-
-        return parent;
+        requiredNode.add(name);
     }
 
-    protected void overwriteProperty(ObjectNode parent, ObjectNode child,
-            String propertyName) {
-        if (child.has(propertyName)) {
-            parent.put(propertyName, child.get(propertyName));
+    private void addToProperties(ObjectNode schema, String name, ObjectNode property) {
+
+        ObjectNode propertiesNode;
+        if (schema.has("properties")) {
+            propertiesNode = (ObjectNode) schema.get("properties");
+        } else {
+            propertiesNode = schema.putObject("properties");
         }
+        propertiesNode.set(name, property);
     }
 
     /**
      * Utility method to find properties from a Java Type following Beans Convention.
      */
-    private <T> HashMap<Method, Field> findProperties(Class<T> type) {
-        Field[] fields = type.getDeclaredFields();
-        Method[] methods = type.getMethods();
-        if (config.sortSchemaProperties()) {
-            // Ordering the properties
-            Arrays.sort(methods, new Comparator<Method>() {
-                public int compare(Method m1, Method m2) {
-                    return m1.getName().compareTo(m2.getName());
-                }
-            });
-        }
+    private <T> Map<String, ObjectNode> findSchemaPropertiesFromMethods(Class<T> type) {
+        Map<String, ObjectNode> propertyMap = config.sortSchemaProperties() ? new TreeMap<>() : new LinkedHashMap<>();
 
-        LinkedHashMap<Method, Field> props = new LinkedHashMap<Method, Field>();
-        // get valid properties (get method and respective field (if exists))
-        for (Method method : methods) {
-            Class<?> declaringClass = method.getDeclaringClass();
-            if (declaringClass.equals(Object.class)
-                    || Collection.class.isAssignableFrom(declaringClass)) {
-                continue;
-            }
+        TypeToken<T> typeToken = TypeToken.of(type);
 
-            if (isGetter(method)) {
-                boolean hasField = false;
-                for (Field field : fields) {
+        for (TypeToken<? super T> implementingTypeToken : typeToken.getTypes()) {
+            Class<?> clazz = implementingTypeToken.getRawType();
+            Method[] methods = clazz.getMethods();
 
-                    int fieldModifiers = field.getModifiers();
+            for (Method method : methods) {
+                Optional<AttributeHolder> attributeHolder = acceptElement(method);
+                if (attributeHolder.isPresent()) {
+                    String propertyName = propertyNameFromMethod(method);
 
-                    if (field.isSynthetic() || field.isEnumConstant() || Modifier.isStatic(fieldModifiers) || Modifier.isTransient(fieldModifiers)) {
-                        continue;
+                    if (propertyMap.containsKey(propertyName)) {
+                        throw new IllegalStateException(format(Locale.ENGLISH,
+                                "Property %s defined multiple times (saw %s)", propertyName, clazz.getSimpleName()));
                     }
-
-                    String name = getNameFromGetter(method);
-                    Optional<AttributeHolder> attributeHolder = AttributeHolder.locate(field);
-
-                    boolean process = true;
-                    if (config.processAnnotatedOnly() && !attributeHolder.isPresent()) {
-                        process = false;
-                    }
-
-                    if (process && field.getName().equalsIgnoreCase(name)) {
-                        props.put(method, field);
-                        hasField = true;
-                        break;
-                    }
-                }
-                if (!hasField) {
-                    props.put(method, null);
+                    Optional<ObjectNode> propertyNode = generateObjectNode(type, method, attributeHolder.get());
+                    propertyNode.ifPresent(node -> propertyMap.put(propertyName, node));
                 }
             }
         }
-        return props;
+
+        return propertyMap;
+    }
+
+    private Optional<AttributeHolder> acceptElement(Method method) {
+        // must be readable
+        if (!method.isAccessible()) {
+            return Optional.empty();
+        }
+        // ignore weird stuff
+        if (method.isBridge() || method.isSynthetic() || method.isDefault()) {
+            return Optional.empty();
+        }
+
+        // fetch annotations for method
+        return AttributeHolder.locate(method);
+    }
+
+    private String propertyNameFromMethod(Method method) {
+        Class<?> clazz=method.getDeclaringClass();
+        try {
+            BeanInfo info = Introspector.getBeanInfo(clazz);
+            PropertyDescriptor[] props = info.getPropertyDescriptors();
+            for (PropertyDescriptor pd : props) {
+                if (method.equals(pd.getWriteMethod()) || method.equals(pd.getReadMethod())) {
+                    return pd.getName();
+                }
+            }
+        } catch (IntrospectionException e) {
+            // ignore, let the throw statement below execute.
+        }
+        throw new IllegalStateException(format(Locale.ENGLISH, "Could not locate property name for %s", method.getName()));
+    }
+
+    private Optional<ObjectNode> generateObjectNode(Class<?> type, Method method, AttributeHolder attributeHolder) {
+        Class<?> returnType = method.getReturnType();
+
+        if (attributeHolder.ignored()) {
+            return Optional.empty();
+        }
+
+        ObjectNode schema = createInstance();
+
+        JsonManagedReference refAnn = method.getAnnotation(JsonManagedReference.class);
+        if (refAnn != null) {
+            Class<?> genericClass;
+            if (Collection.class.isAssignableFrom(returnType)) {
+                ParameterizedType genericType = (ParameterizedType) method.getGenericReturnType();
+                genericClass = (Class<?>) genericType.getActualTypeArguments()[0];
+            } else {
+                genericClass = returnType;
+            }
+            ManagedReference forwardReference = new ManagedReference(type, refAnn.value(), genericClass);
+
+            if (!isForwardReferencePiled(forwardReference)) {
+                pushForwardReference(forwardReference);
+            } else {
+                pullForwardReference(forwardReference);
+                pullBackwardReference(forwardReference);
+                //return null;
+                return Optional.of(createRefSchema("#"));
+            }
+        }
+
+        JsonBackReference backRefAnn = method.getAnnotation(JsonBackReference.class);
+        if (backRefAnn != null) {
+            Class<?> genericClass;
+            if (Collection.class.isAssignableFrom(returnType)) {
+                ParameterizedType genericType = (ParameterizedType) method.getGenericReturnType();
+                genericClass = (Class<?>) genericType.getActualTypeArguments()[0];
+            } else {
+                genericClass = returnType;
+            }
+            ManagedReference backReference = new ManagedReference(genericClass, backRefAnn.value(), type);
+
+            if (isForwardReferencePiled(backReference) &&
+                    !isBackwardReferencePiled(backReference)) {
+                pushBackwardReference(backReference);
+            } else {
+                return Optional.empty();
+            }
+        }
+
+        if (Collection.class.isAssignableFrom(returnType)) {
+            processPropertyCollection(method, schema);
+        } else {
+            schema = generateSchema(returnType);
+        }
+
+        processSchemaProperty(schema, attributeHolder, false);
+
+        // Check if the Nullable annotation is present, and if so, add 'null' to type attr
+        if (attributeHolder.nullable()) {
+            if (returnType.isEnum()) {
+                ((ArrayNode) schema.get("enum")).add("null");
+            } else {
+                JsonNode typeNode = schema.get("type");
+                if (typeNode instanceof ArrayNode) {
+                    ArrayNode arrayNode = (ArrayNode) typeNode;
+                    arrayNode.add("null");
+                } else if (typeNode instanceof TextNode) {
+                    ArrayNode typeArray = schema.putArray("type");
+                    typeArray.add(typeNode);
+                    typeArray.add("null");
+                } else {
+                    throw new IllegalStateException("Return type is not nullable");
+                }
+            }
+        }
+
+        return Optional.of(schema);
     }
 
     private <T> List<Field> findFields(Class<T> type) {
@@ -567,32 +548,5 @@ public abstract class JsonSchemaGenerator {
             }
         }
         return props;
-    }
-
-    private String firstToLowCase(String string) {
-        return Character.toLowerCase(string.charAt(0))
-                + (string.length() > 1 ? string.substring(1) : "");
-    }
-
-    private boolean isGetter(final Method method) {
-        return method.getName().startsWith("get") || method.getName().startsWith("is");
-    }
-
-    private String getNameFromGetter(final Method getter) {
-        String[] getterPrefixes = {"get", "is"};
-        String methodName = getter.getName();
-        String fieldName = null;
-        for (String prefix : getterPrefixes) {
-            if (methodName.startsWith(prefix)) {
-                fieldName = methodName.substring(prefix.length());
-            }
-        }
-
-        if (fieldName == null) {
-            return null;
-        }
-
-        fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
-        return fieldName;
     }
 }

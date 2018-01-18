@@ -11,9 +11,8 @@ public abstract class JsonSchemaGeneratorConfiguration {
                 .setNodeFactory(JsonNodeFactory.instance)
                 .setSortSchemaProperties(true)
                 .setAddSchemaVersion(true)
-                .setProcessAnnotatedOnly(false)
-                .setProcessPropertiesOnly(false)
-                .setProcessFieldsOnly(false);
+                .setProcessProperties(true)
+                .setProcessFields(false);
     }
 
     public abstract JsonNodeFactory nodeFactory();
@@ -22,11 +21,9 @@ public abstract class JsonSchemaGeneratorConfiguration {
 
     public abstract boolean sortSchemaProperties();
 
-    public abstract boolean processAnnotatedOnly();
+    public abstract boolean processProperties();
 
-    public abstract boolean processPropertiesOnly();
-
-    public abstract boolean processFieldsOnly();
+    public abstract boolean processFields();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -37,11 +34,9 @@ public abstract class JsonSchemaGeneratorConfiguration {
 
         abstract Builder setSortSchemaProperties(boolean sortSchemaProperties);
 
-        abstract Builder setProcessAnnotatedOnly(boolean processAnnotatedOnly);
+        abstract Builder setProcessProperties(boolean processPropertiesOnly);
 
-        abstract Builder setProcessPropertiesOnly(boolean processPropertiesOnly);
-
-        abstract Builder setProcessFieldsOnly(boolean processFieldsOnly);
+        abstract Builder setProcessFields(boolean processFieldsOnly);
 
         public Builder removeSchemaVersion() {
             return setAddSchemaVersion(false);
@@ -51,16 +46,12 @@ public abstract class JsonSchemaGeneratorConfiguration {
             return setSortSchemaProperties(false);
         }
 
-        public Builder processAnnotatedOnly() {
-            return setProcessAnnotatedOnly(true);
+        public Builder processFields() {
+            return setProcessFields(true);
         }
 
-        public Builder processFieldsOnly() {
-            return setProcessFieldsOnly(true);
-        }
-
-        public Builder processPropertiesOnly() {
-            return setProcessPropertiesOnly(true);
+        public Builder dontProcessProperties() {
+            return setProcessProperties(false);
         }
 
         public Builder customNodeFactory(JsonNodeFactory nodeFactory) {
