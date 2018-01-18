@@ -33,12 +33,16 @@ import com.github.reinert.jjschema.v1.SchemaWrapper;
 @Deprecated
 public class JsonSchemaGeneratorV4 extends JsonSchemaGenerator {
 
+    JsonSchemaGeneratorV4(JsonSchemaGeneratorConfiguration config) {
+        super(config);
+    }
+
     @Override
     protected void processSchemaProperty(ObjectNode schema, AttributeHolder attributeHolder) {
         checkNotNull(attributeHolder, "attributeHolder is null");
         attributeHolder.$ref().ifPresent($ref -> schema.put("$ref", $ref));
 
-        if (autoPutVersion) {
+        if (config.addSchemaVersion()) {
             schema.put("$schema", SchemaWrapper.DRAFT_04);
         }
         processCommonAttributes(schema, attributeHolder);

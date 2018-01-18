@@ -19,52 +19,57 @@
 package com.github.reinert.jjschema;
 
 
-/**
- * A SchemaGenerator builder for creating SchemaGenerators considering some options.
- *
- * @author reinert
- */
-public class SchemaGeneratorBuilder {
-    
-    private SchemaGeneratorBuilder() {}
+import java.util.function.Function;
 
-    public static ConfigurationStep draftV4Schema() {
-        return new ConfigurationStep(new JsonSchemaGeneratorV4());
+public final class SchemaGeneratorBuilder {
+
+    private SchemaGeneratorBuilder() {
     }
 
-    public static ConfigurationStep draftV4HyperSchema() {
-        return new ConfigurationStep(new HyperSchemaGeneratorV4(new JsonSchemaGeneratorV4()));
+    public static JsonSchemaGeneratorConfigurationBuilder draftV4Schema() {
+        return new JsonSchemaGeneratorConfigurationBuilder((config -> new JsonSchemaGeneratorV4(config)));
     }
 
-    public static class ConfigurationStep {
-        final JsonSchemaGenerator generator;
+    public static JsonSchemaGeneratorConfigurationBuilder draftV4HyperSchema() {
+        return new JsonSchemaGeneratorConfigurationBuilder((config -> new HyperSchemaGeneratorV4(new JsonSchemaGeneratorV4(config))));
+    }
 
-        ConfigurationStep(JsonSchemaGenerator generator) {
-            this.generator = generator;
+    public static class JsonSchemaGeneratorConfigurationBuilder {
+
+        private final Function<JsonSchemaGeneratorConfiguration, JsonSchemaGenerator> factory;
+        private final JsonSchemaGeneratorConfiguration.Builder builder = JsonSchemaGeneratorConfiguration.builder();
+
+        JsonSchemaGeneratorConfigurationBuilder(Function<JsonSchemaGeneratorConfiguration, JsonSchemaGenerator> factory) {
+            this.factory = factory;
         }
 
-        public ConfigurationStep setAutoPutSchemaVersion(boolean autoPutVersion) {
-            generator.autoPutVersion = autoPutVersion;
+        public JsonSchemaGeneratorConfigurationBuilder removeSchemaVersion() {
+            builder.removeSchemaVersion();
             return this;
         }
 
-        public ConfigurationStep sortProperties(boolean sortProperties) {
-            generator.sortProperties = sortProperties;
+        public JsonSchemaGeneratorConfigurationBuilder dontSortSchemaProperties() {
+            builder.dontSortSchemaProperties();
             return this;
         }
-        
-        public ConfigurationStep processAnnotatedOnly(boolean processAnnotatedOnly) {
-            generator.processAnnotatedOnly = processAnnotatedOnly;
+
+        public JsonSchemaGeneratorConfigurationBuilder processAnnotatedOnly() {
+            builder.processAnnotatedOnly();
             return this;
         }
-        
-        public ConfigurationStep processFieldsOnly(boolean processFieldsOnly) {
-            generator.processFieldsOnly = processFieldsOnly;
+
+        public JsonSchemaGeneratorConfigurationBuilder processPropertiesOnly() {
+            builder.processPropertiesOnly();
             return this;
         }
-        
+
+        public JsonSchemaGeneratorConfigurationBuilder processFieldsOnly() {
+            builder.processFieldsOnly();
+            return this;
+        }
+
         public final JsonSchemaGenerator build() {
-            return generator;
+            return factory.apply(builder.build());
         }
     }
 }

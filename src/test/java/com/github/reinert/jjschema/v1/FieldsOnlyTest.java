@@ -1,9 +1,5 @@
 package com.github.reinert.jjschema.v1;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.reinert.jjschema.JsonSchema;
@@ -11,8 +7,11 @@ import com.github.reinert.jjschema.JsonSchemaGenerator;
 import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.exception.TypeException;
 import com.github.reinert.jjschema.exception.UnavailableVersion;
-
 import junit.framework.TestCase;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class FieldsOnlyTest extends TestCase {
@@ -45,8 +44,8 @@ public class FieldsOnlyTest extends TestCase {
 
     public void testAnnotatedFieldsOnly() throws UnavailableVersion, IOException, TypeException {
         JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
-                .processFieldsOnly(true)
-                .processAnnotatedOnly(true)
+                .processFieldsOnly()
+                .processAnnotatedOnly()
                 .build();
 
         JsonNode schemaNode = v4generator.generateSchema(Employee.class);
@@ -59,7 +58,7 @@ public class FieldsOnlyTest extends TestCase {
 
     public void testFieldsOnly() throws UnavailableVersion, IOException, TypeException {
         JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
-                .processFieldsOnly(true)
+                .processFieldsOnly()
                 .build();
 
         JsonNode schemaNode = v4generator.generateSchema(Employee.class);
@@ -76,8 +75,8 @@ public class FieldsOnlyTest extends TestCase {
 
     public void testNoSortedFields() throws UnavailableVersion, IOException, TypeException {
         JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
-                .processFieldsOnly(true)
-                .sortProperties(false)
+                .processFieldsOnly()
+                .dontSortSchemaProperties()
                 .build();
 
         JsonNode schemaNode = v4generator.generateSchema(Employee.class);

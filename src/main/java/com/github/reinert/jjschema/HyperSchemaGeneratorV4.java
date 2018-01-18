@@ -24,8 +24,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.reinert.jjschema.exception.InvalidLinkMethod;
 import com.github.reinert.jjschema.exception.TypeException;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -33,6 +31,21 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Iterator;
+
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 
 /**
  * A Hyper-Schema generator from JSR311 specification (Java RESTful) annotated classes.
@@ -49,6 +62,7 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
     final JsonSchemaGenerator jsonSchemaGenerator;
 
     protected HyperSchemaGeneratorV4(JsonSchemaGenerator jsonSchemaGenerator) {
+        super(jsonSchemaGenerator.config);
         this.jsonSchemaGenerator = jsonSchemaGenerator;
     }
 

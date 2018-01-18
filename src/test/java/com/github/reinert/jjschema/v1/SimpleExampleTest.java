@@ -18,12 +18,14 @@
 
 package com.github.reinert.jjschema.v1;
 
+import static org.junit.Assert.assertEquals;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.reinert.jjschema.JsonSchema;
 import com.github.reinert.jjschema.exception.UnavailableVersion;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,14 +33,10 @@ import java.io.InputStream;
 /**
  * @author reinert
  */
-public class SimpleExampleTest extends TestCase {
+public class SimpleExampleTest {
 
     static ObjectMapper MAPPER = new ObjectMapper();
     JsonSchemaFactory schemaFactory = new JsonSchemaV4Factory();
-
-    public SimpleExampleTest(String testName) {
-        super(testName);
-    }
 
     /**
      * Test the scheme generate following a scheme source, avaliable at
@@ -48,6 +46,7 @@ public class SimpleExampleTest extends TestCase {
      * @throws com.fasterxml.jackson.core.JsonProcessingException
      *
      */
+    @Test
     public void testGenerateSchema() throws UnavailableVersion, JsonProcessingException, IOException {
 
         final InputStream in = SimpleExampleTest.class.getResourceAsStream("/simple_example.json");

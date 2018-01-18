@@ -18,12 +18,14 @@
 
 package com.github.reinert.jjschema.v1;
 
+import static org.junit.Assert.assertEquals;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.reinert.jjschema.JsonSchema;
 import com.github.reinert.jjschema.exception.UnavailableVersion;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,28 +33,21 @@ import java.io.InputStream;
 /**
  * @author reinert
  */
-public class SimpleTest extends TestCase {
+public class SimpleTest {
 
     static ObjectMapper MAPPER = new ObjectMapper();
     JsonSchemaFactory schemaFactory = new JsonSchemaV4Factory();
 
-    public SimpleTest(String testName) {
-        super(testName);
-    }
-
     /**
-     * Test the scheme generate following a scheme source, avaliable at
-     * http://json-schema.org/examples.html the output should match the example.
-     *
-     * @throws java.io.IOException
-     * @throws com.fasterxml.jackson.core.JsonProcessingException
-     *
+     * Test the scheme generate following a scheme source, avaliable at http://json-schema.org/examples.html the output should match the example.
      */
+    @Test
     public void testGenerateSchema() throws UnavailableVersion, JsonProcessingException, IOException {
 
         final InputStream in = SimpleTest.class.getResourceAsStream("/simple_example.json");
-        if (in == null)
+        if (in == null) {
             throw new IOException("resource not found");
+        }
         JsonNode fromResource = MAPPER.readTree(in);
         JsonNode fromJavaType = schemaFactory.createSchema(SimpleExample.class);
         System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(fromJavaType));
@@ -62,6 +57,7 @@ public class SimpleTest extends TestCase {
 
     @JsonSchema(title = "Example Schema")
     static class SimpleExample {
+
         @JsonSchema(required = true)
         private String firstName;
         @JsonSchema(required = true)
