@@ -34,8 +34,9 @@ public class CustomArraySchemaWrapper extends CustomSchemaWrapper {
     public CustomArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, Class<?> parametrizedType) {
         super(nodeFactory, type);
         if (parametrizedType != null) {
-            if (!Collection.class.isAssignableFrom(type))
+            if (!Collection.class.isAssignableFrom(type)) {
                 throw new RuntimeException("Cannot instantiate a SchemaWrapper of a non Collection class with a Parametrized Type.");
+            }
             this.itemsSchemaWrapper = SchemaWrapperFactory.createWrapper(nodeFactory, parametrizedType);
         } else {
             this.itemsSchemaWrapper = null;

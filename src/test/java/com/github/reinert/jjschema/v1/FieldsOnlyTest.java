@@ -15,9 +15,11 @@ import java.util.Map;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class FieldsOnlyTest extends TestCase {
+
     private final ObjectMapper MAPPER = new ObjectMapper();
 
     static class Employee {
+
         @JsonSchema(required = true, minLength = 5, maxLength = 50, description = "Name")
         private String name;
 
@@ -65,12 +67,12 @@ public class FieldsOnlyTest extends TestCase {
 
         String str = MAPPER.writeValueAsString(schemaNode);
         Map<String, Object> result = MAPPER.readValue(str, Map.class);
-        Map<String,String> props = (Map) result.get(CustomSchemaWrapper.TAG_PROPERTIES);
+        Map<String, String> props = (Map) result.get(CustomSchemaWrapper.TAG_PROPERTIES);
         assertEquals(3, props.size());
 
         // Check properties are sorted (default behaviour)
         String[] keyArr = props.keySet().toArray(new String[0]);
-        assertTrue(Arrays.deepEquals(new String[] {"lastName", "name", "retired"}, keyArr));
+        assertTrue(Arrays.deepEquals(new String[]{"lastName", "name", "retired"}, keyArr));
     }
 
     public void testNoSortedFields() throws UnavailableVersion, IOException, TypeException {
@@ -83,10 +85,10 @@ public class FieldsOnlyTest extends TestCase {
 
         String str = MAPPER.writeValueAsString(schemaNode);
         Map<String, Object> result = MAPPER.readValue(str, Map.class);
-        Map<String,String> props = (Map) result.get(CustomSchemaWrapper.TAG_PROPERTIES);
+        Map<String, String> props = (Map) result.get(CustomSchemaWrapper.TAG_PROPERTIES);
         assertEquals(3, props.size());
 
         String[] keyArr = props.keySet().toArray(new String[0]);
-        assertTrue(Arrays.deepEquals(new String[] {"name", "lastName", "retired"}, keyArr));
+        assertTrue(Arrays.deepEquals(new String[]{"name", "lastName", "retired"}, keyArr));
     }
 }

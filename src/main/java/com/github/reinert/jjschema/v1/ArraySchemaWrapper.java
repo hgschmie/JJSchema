@@ -34,23 +34,27 @@ public class ArraySchemaWrapper extends SchemaWrapper {
 
     final SchemaWrapper itemsSchemaWrapper;
 
-    public ArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, Type propertyType, Set<ManagedReference> managedReferences, String relativeId, boolean ignoreProperties) {
+    public ArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, Type propertyType, Set<ManagedReference> managedReferences, String relativeId,
+            boolean ignoreProperties) {
         super(nodeFactory, type);
         setType("array");
         if (propertyType != null) {
-            if (!Collection.class.isAssignableFrom(type))
+            if (!Collection.class.isAssignableFrom(type)) {
                 throw new RuntimeException("Cannot instantiate a SchemaWrapper of a non Collection class with a Parametrized Type.");
-            if (managedReferences == null)
+            }
+            if (managedReferences == null) {
                 this.itemsSchemaWrapper = SchemaWrapperFactory.createWrapper(nodeFactory, propertyType);
-            else
+            } else {
                 this.itemsSchemaWrapper = SchemaWrapperFactory.createWrapper(nodeFactory, propertyType, managedReferences, relativeId, ignoreProperties);
+            }
             setItems(this.itemsSchemaWrapper.asJson());
         } else {
             this.itemsSchemaWrapper = null;
         }
     }
 
-    public ArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, Class<?> parametrizedType, Set<ManagedReference> managedReferences, boolean ignoreProperties) {
+    public ArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, Class<?> parametrizedType, Set<ManagedReference> managedReferences,
+            boolean ignoreProperties) {
         this(nodeFactory, type, parametrizedType, managedReferences, null, ignoreProperties);
     }
 
@@ -59,7 +63,7 @@ public class ArraySchemaWrapper extends SchemaWrapper {
     }
 
     public ArraySchemaWrapper(JsonNodeFactory nodeFactory, Class<?> type, RefSchemaWrapper refSchemaWrapper) {
-        super(nodeFactory,  type);
+        super(nodeFactory, type);
         setType("array");
         this.itemsSchemaWrapper = refSchemaWrapper;
         setItems(this.itemsSchemaWrapper.asJson());

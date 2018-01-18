@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.SchemaIgnore;
 import junit.framework.TestCase;
 
@@ -58,6 +56,7 @@ public class SchemaIgnoreTest extends TestCase {
     }
 
     static class Sale {
+
         int id;
         @SchemaIgnore
         @JsonManagedReference
@@ -81,6 +80,7 @@ public class SchemaIgnoreTest extends TestCase {
     }
 
     static class SaleItem {
+
         int idSale;
         int seqNumber;
         @SchemaIgnore

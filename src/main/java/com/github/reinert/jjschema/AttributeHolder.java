@@ -10,7 +10,6 @@ import java.lang.reflect.AnnotatedElement;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.OptionalLong;
 
 /**
  * Collects all attributes discovered from the various annotations.
@@ -24,12 +23,6 @@ public abstract class AttributeHolder {
         Builder builder = builder();
 
         boolean foundAnnotations = false;
-        final Attributes attributes = element.getAnnotation(Attributes.class);
-        if (attributes != null) {
-            builder.attributes(attributes);
-            foundAnnotations = true;
-        }
-
         final JsonSchema jsonSchema = element.getAnnotation(JsonSchema.class);
         if (jsonSchema != null) {
             builder.attributes(jsonSchema);
@@ -145,74 +138,6 @@ public abstract class AttributeHolder {
 
         public abstract AttributeHolder build();
 
-        public Builder attributes(Attributes attributes) {
-            if (!attributes.$ref().isEmpty()) {
-                $ref(attributes.$ref());
-            }
-
-            if (!attributes.id().isEmpty()) {
-                id(attributes.id());
-            }
-
-            if (!attributes.title().isEmpty()) {
-                title(attributes.title());
-            }
-
-            if (!attributes.description().isEmpty()) {
-                description(attributes.description());
-            }
-
-            if (attributes.maximum() >= 0) {
-                maximum(attributes.maximum());
-            }
-
-            exclusiveMaximum(attributes.exclusiveMaximum());
-
-            if (attributes.minimum() >= 0) {
-                minimum(attributes.minimum());
-            }
-
-            exclusiveMinimum(attributes.exclusiveMinimum());
-
-            if (!attributes.pattern().isEmpty()) {
-                pattern(attributes.pattern());
-            }
-
-            if (!attributes.format().isEmpty()) {
-                format(attributes.format());
-            }
-
-            required(attributes.required());
-
-            enumsBuilder().addAll(Arrays.asList(attributes.enums()));
-
-            if (attributes.minItems() > 0) {
-                minItems(attributes.minItems());
-            }
-
-            if (attributes.maxItems() >= 0) {
-                maxItems(attributes.maxItems());
-            }
-
-            uniqueItems(attributes.uniqueItems());
-
-            if (attributes.multipleOf() > 0) {
-                multipleOf(attributes.multipleOf());
-            }
-
-            if (attributes.minLength() > 0) {
-                minLength(attributes.minLength());
-            }
-
-            if (attributes.maxLength() >= 0) {
-                maxLength(attributes.maxLength());
-            }
-
-            readonly(attributes.readonly());
-            additionalProperties(attributes.additionalProperties());
-
-            return this;
-        }
         public Builder attributes(JsonSchema jsonSchema) {
             if (!jsonSchema.$ref().isEmpty()) {
                 $ref(jsonSchema.$ref());

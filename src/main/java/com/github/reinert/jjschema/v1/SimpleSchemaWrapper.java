@@ -18,10 +18,10 @@
 
 package com.github.reinert.jjschema.v1;
 
-import java.lang.reflect.Type;
-
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.reinert.jjschema.SimpleTypeMappings;
+
+import java.lang.reflect.Type;
 
 /**
  * @author Danilo Reinert

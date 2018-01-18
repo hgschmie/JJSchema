@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.AttributeHolder;
-import com.github.reinert.jjschema.Attributes;
 import com.github.reinert.jjschema.ManagedReference;
 import com.github.reinert.jjschema.Nullable;
 import com.github.reinert.jjschema.SchemaIgnore;
@@ -50,10 +49,10 @@ import java.util.Set;
 
 public class PropertyWrapper extends SchemaWrapper {
 
-	final static String propertiesStr = "/properties/";
-	final static String itemsStr = "/items";
+    final static String propertiesStr = "/properties/";
+    final static String itemsStr = "/items";
 
-	enum ReferenceType {NONE, FORWARD, BACKWARD}
+    enum ReferenceType {NONE, FORWARD, BACKWARD}
 
     final CustomSchemaWrapper ownerSchemaWrapper;
     final SchemaWrapper schemaWrapper;
@@ -64,11 +63,13 @@ public class PropertyWrapper extends SchemaWrapper {
     ManagedReference managedReference;
     ReferenceType referenceType;
 
-    public PropertyWrapper(JsonNodeFactory nodeFactory, CustomSchemaWrapper ownerSchemaWrapper, Set<ManagedReference> managedReferences, Method method, Field field) {
+    public PropertyWrapper(JsonNodeFactory nodeFactory, CustomSchemaWrapper ownerSchemaWrapper, Set<ManagedReference> managedReferences, Method method,
+            Field field) {
         super(nodeFactory, null);
 
-        if (method == null)
+        if (method == null) {
             throw new RuntimeException("Error at " + ownerSchemaWrapper.getJavaType().getName() + ": Cannot instantiate a PropertyWrapper with a null method.");
+        }
 
         this.ownerSchemaWrapper = ownerSchemaWrapper;
         this.field = field;
@@ -81,23 +82,22 @@ public class PropertyWrapper extends SchemaWrapper {
         Class<?> collectionType = null;
 
         if (genericType instanceof TypeVariable) {
-        	ParameterizedType p = ownerSchemaWrapper.getParameterizedType();
-        	if (p!=null) {
-        		final int i= Arrays.asList(((Class<?>)p.getRawType()).getTypeParameters()).indexOf(genericType);
-        		propertyType = (Class<?>) p.getActualTypeArguments()[i];
-        	}
+            ParameterizedType p = ownerSchemaWrapper.getParameterizedType();
+            if (p != null) {
+                final int i = Arrays.asList(((Class<?>) p.getRawType()).getTypeParameters()).indexOf(genericType);
+                propertyType = (Class<?>) p.getActualTypeArguments()[i];
+            }
         }
-        
+
         if (Collection.class.isAssignableFrom((Class<?>) propertyType)) {
             collectionType = method.getReturnType();
             if (!(genericType instanceof ParameterizedType)) {
-            	genericType = collectionType.getGenericSuperclass();
-                while (!(genericType instanceof ParameterizedType) ) {                    
-                	genericType = ((Class<?>) genericType).getGenericSuperclass();
+                genericType = collectionType.getGenericSuperclass();
+                while (!(genericType instanceof ParameterizedType)) {
+                    genericType = ((Class<?>) genericType).getGenericSuperclass();
                 }
             }
-        	propertyType =  ((ParameterizedType) genericType).getActualTypeArguments()[0];
-            
+            propertyType = ((ParameterizedType) genericType).getActualTypeArguments()[0];
 
             relativeId = propertiesStr + getName() + itemsStr;
         } else {
@@ -118,18 +118,21 @@ public class PropertyWrapper extends SchemaWrapper {
                 if (ownerSchemaWrapper.pushReference(getManagedReference())) {
                     String relativeId1 = ownerSchemaWrapper.getRelativeId();
                     if (relativeId1.endsWith(itemsStr)) {
-                        relativeId1 = relativeId1.substring(0, relativeId1.substring(0, relativeId1.length() - itemsStr.length()).lastIndexOf("/") - (propertiesStr.length() - 1));
+                        relativeId1 = relativeId1.substring(0,
+                                relativeId1.substring(0, relativeId1.length() - itemsStr.length()).lastIndexOf("/") - (propertiesStr.length() - 1));
                     } else {
                         relativeId1 = relativeId1.substring(0, relativeId1.lastIndexOf("/") - (propertiesStr.length() - 1));
                     }
                     schemaWrapperLocal = new RefSchemaWrapper(nodeFactory, propertyType, relativeId1);
-                } else
+                } else {
                     schemaWrapperLocal = new EmptySchemaWrapper(nodeFactory);
+                }
             }
-            if (schemaWrapperLocal.isRefWrapper() && collectionType != null)
+            if (schemaWrapperLocal.isRefWrapper() && collectionType != null) {
                 this.schemaWrapper = SchemaWrapperFactory.createArrayRefWrapper(nodeFactory, (RefSchemaWrapper) schemaWrapperLocal);
-            else
+            } else {
                 this.schemaWrapper = schemaWrapperLocal;
+            }
         } else if (ownerSchemaWrapper.getJavaType() == propertyType) {
             SchemaWrapper schemaWrapperLocal = new RefSchemaWrapper(nodeFactory, propertyType, ownerSchemaWrapper.getRelativeId());
             if (collectionType != null) {
@@ -145,7 +148,7 @@ public class PropertyWrapper extends SchemaWrapper {
             if (collectionType != null) {
                 this.schemaWrapper = createArrayWrapper(managedReferences, propertyType, collectionType, relativeId1);
             } else if (genericType instanceof ParameterizedType) {
-            	this.schemaWrapper=createWrapper(managedReferences, genericType, relativeId);
+                this.schemaWrapper = createWrapper(managedReferences, genericType, relativeId);
             } else {
                 this.schemaWrapper = createWrapper(managedReferences, propertyType, relativeId1);
             }
@@ -167,8 +170,9 @@ public class PropertyWrapper extends SchemaWrapper {
     }
 
     public String getName() {
-        if (name == null)
+        if (name == null) {
             name = processPropertyName();
+        }
         return name;
     }
 
@@ -265,7 +269,8 @@ public class PropertyWrapper extends SchemaWrapper {
 
     protected SchemaWrapper createArrayWrapper(Set<ManagedReference> managedReferences, Type propertyType,
             Class<?> collectionType, String relativeId1) {
-        return SchemaWrapperFactory.createArrayWrapper(getNodeFactory(), collectionType, propertyType, managedReferences, relativeId1, shouldIgnoreProperties());
+        return SchemaWrapperFactory
+                .createArrayWrapper(getNodeFactory(), collectionType, propertyType, managedReferences, relativeId1, shouldIgnoreProperties());
     }
 
     protected void setRequired(boolean required) {
@@ -311,8 +316,10 @@ public class PropertyWrapper extends SchemaWrapper {
 
         JsonBackReference backRefAnn = getAccessibleObject().getAnnotation(JsonBackReference.class);
         if (backRefAnn != null) {
-            if (referenceExists)
-                throw new RuntimeException("Error at " + getOwnerSchema().getJavaType().getName() + ": Cannot reference " + propertyType.getTypeName() + " both as Managed and Back Reference.");
+            if (referenceExists) {
+                throw new RuntimeException("Error at " + getOwnerSchema().getJavaType().getName() + ": Cannot reference " + propertyType.getTypeName()
+                        + " both as Managed and Back Reference.");
+            }
             managedReference = new ManagedReference(propertyType, backRefAnn.value(), getOwnerSchema().getJavaType());
             referenceType = ReferenceType.BACKWARD;
         }

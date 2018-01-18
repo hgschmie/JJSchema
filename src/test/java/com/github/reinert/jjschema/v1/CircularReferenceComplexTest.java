@@ -41,10 +41,7 @@ public class CircularReferenceComplexTest extends TestCase {
     }
 
     /**
-     * Test if @JsonManagedReference and @JsonBackReference works at a Complex Circular Reference case.
-     * This feature is not stable yet.
-     *
-     * @throws java.io.IOException
+     * Test if @JsonManagedReference and @JsonBackReference works at a Complex Circular Reference case. This feature is not stable yet.
      */
     public void testGenerateSchema() throws IOException {
 

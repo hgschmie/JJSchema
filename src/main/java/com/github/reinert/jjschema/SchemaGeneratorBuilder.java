@@ -21,7 +21,6 @@ package com.github.reinert.jjschema;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public final class SchemaGeneratorBuilder {

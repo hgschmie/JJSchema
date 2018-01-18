@@ -42,12 +42,7 @@ public class InterfaceTest extends TestCase {
     }
 
     /**
-     * Test the scheme generate following a scheme source, avaliable at
-     * http://json-schema.org/examples.html the output should match the example.
-     *
-     * @throws IOException
-     * @throws JsonProcessingException
-     *
+     * Test the scheme generate following a scheme source, avaliable at http://json-schema.org/examples.html the output should match the example.
      */
     public void testGenerateSchema() throws UnavailableVersion, JsonProcessingException, IOException {
 

@@ -60,9 +60,9 @@ public enum SimpleTypeMappings {
     CHARSEQUENCE(CharSequence.class, "string"),
     STRING(String.class, "string"),
     UUID(UUID.class, "string"),
-    ZONEDDATETIME(ZonedDateTime.class,"string"),
-    LOCALDATE(LocalDate.class,"string"),
-    INSTANT(Instant.class,"string");
+    ZONEDDATETIME(ZonedDateTime.class, "string"),
+    LOCALDATE(LocalDate.class, "string"),
+    INSTANT(Instant.class, "string");
 
     private static final Map<Class<?>, String> MAPPINGS;
 
@@ -70,8 +70,9 @@ public enum SimpleTypeMappings {
         // Class objects are all singletons, so we can use that
         MAPPINGS = new IdentityHashMap<Class<?>, String>();
 
-        for (final SimpleTypeMappings mapping : values())
+        for (final SimpleTypeMappings mapping : values()) {
             MAPPINGS.put(mapping.c, mapping.schemaType);
+        }
     }
 
     private final Class<?> c;
@@ -89,9 +90,12 @@ public enum SimpleTypeMappings {
      * @return the primitive type if found, {@code null} otherwise
      */
     public static String forClass(final Type type) {
-    	if (!(type instanceof Class)) return null;
-        if (AbstractCollection.class.isAssignableFrom((Class<?>) type))
+        if (!(type instanceof Class)) {
+            return null;
+        }
+        if (AbstractCollection.class.isAssignableFrom((Class<?>) type)) {
             return "array";
+        }
         return MAPPINGS.get(type);
     }
 

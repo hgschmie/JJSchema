@@ -48,9 +48,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 /**
- * A Hyper-Schema generator from JSR311 specification (Java RESTful) annotated classes.
- * It generates an hyper-schema with correct links, targets, mediaType, and other properties.
- * Please consider looking at JavaRESTfulTest for an example of how to use it.
+ * A Hyper-Schema generator from JSR311 specification (Java RESTful) annotated classes. It generates an hyper-schema with correct links, targets, mediaType, and
+ * other properties. Please consider looking at JavaRESTfulTest for an example of how to use it.
  *
  * @author Danilo
  */
@@ -58,7 +57,7 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
 
     private static final String BINARY_ENCODING = "binaryEncoding";
     private static final String MEDIA_TYPE = "mediaType";
-    
+
     final JsonSchemaGenerator jsonSchemaGenerator;
 
     protected HyperSchemaGeneratorV4(JsonSchemaGenerator jsonSchemaGenerator) {
@@ -101,12 +100,14 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
         }
 
         // If the rel was not informed than assume the method name
-        if (rel == null)
+        if (rel == null) {
             rel = method.getName();
+        }
 
         // if the href was not informed than fill with default #
-        if (href == null)
+        if (href == null) {
             href = "#";
+        }
 
         ObjectNode link = jsonSchemaGenerator.createInstance();
         link.put("href", href);
@@ -115,8 +116,9 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
 
         // TODO: by default use a Prototype containing only the $id or $ref for the TargetSchema
         ObjectNode tgtSchema = generateSchema(method.getReturnType());
-        if (tgtSchema != null)
+        if (tgtSchema != null) {
             link.set("targetSchema", tgtSchema);
+        }
 
         // Check possible params and form schema attribute.
         // If it has QueryParam or FormParam than the schema must have these params as properties.
@@ -164,8 +166,9 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
                         }
                         for (int k = j + 1; k < paramAns.length; k++) {
                             Annotation a2 = paramAns[k];
-                            if (a2 instanceof com.github.reinert.jjschema.Media)
+                            if (a2 instanceof com.github.reinert.jjschema.Media) {
                                 throw new RuntimeException("Media cannot be declared along with PathParam.");
+                            }
                         }
                         isBodyParam = false;
                         continue;
@@ -187,8 +190,9 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
                         }
                         for (int k = j + 1; k < paramAns.length; k++) {
                             Annotation a2 = paramAns[k];
-                            if (a2 instanceof com.github.reinert.jjschema.Media)
+                            if (a2 instanceof com.github.reinert.jjschema.Media) {
                                 throw new RuntimeException("Media cannot be declared along with MatrixParam.");
+                            }
                         }
                         isBodyParam = false;
                         continue;
@@ -220,8 +224,9 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
                 }
             }
 
-            if (hasBodyParam && hasParam)
+            if (hasBodyParam && hasParam) {
                 throw new RuntimeException("JsonSchema does not support both FormParam or QueryParam and BodyParam at the same time.");
+            }
 
             link.set("schema", schema);
         }
@@ -229,7 +234,7 @@ public class HyperSchemaGeneratorV4 extends JsonSchemaGenerator {
         return link;
     }
 
-    private <T> ObjectNode generateHyperSchemaFromResource(Class<T> type) throws TypeException  {
+    private <T> ObjectNode generateHyperSchemaFromResource(Class<T> type) throws TypeException {
         ObjectNode schema = null;
 
         Annotation[] ans = type.getAnnotations();

@@ -60,21 +60,22 @@ public abstract class JsonSchemaGenerator {
     private static final String TAG_REQUIRED = "required";
     private static final String TAG_TYPE = "type";
     private static final String TAG_ARRAY = "array";
-    
+
     private Set<ManagedReference> forwardReferences;
     private Set<ManagedReference> backReferences;
 
     protected final JsonNodeFactory nodeFactory;
     protected final JsonSchemaGeneratorConfiguration config;
-    
+
     protected JsonSchemaGenerator(JsonSchemaGeneratorConfiguration config) {
         this.nodeFactory = config.nodeFactory();
         this.config = config;
     }
 
     Set<ManagedReference> getForwardReferences() {
-        if (forwardReferences == null)
+        if (forwardReferences == null) {
             forwardReferences = new LinkedHashSet<ManagedReference>();
+        }
         return forwardReferences;
     }
 
@@ -91,8 +92,9 @@ public abstract class JsonSchemaGenerator {
     }
 
     Set<ManagedReference> getBackwardReferences() {
-        if (backReferences == null)
+        if (backReferences == null) {
             backReferences = new LinkedHashSet<ManagedReference>();
+        }
         return backReferences;
     }
 
@@ -125,11 +127,7 @@ public abstract class JsonSchemaGenerator {
 
 
     /**
-     * Reads annotations and put its values into the
-     * generating schema. Usually, some verification is done for not putting the
-     * default values.
-     *
-     * @param schema
+     * Reads annotations and put its values into the generating schema. Usually, some verification is done for not putting the default values.
      */
     protected abstract void processSchemaProperty(ObjectNode schema, AttributeHolder attributeHolder);
 
@@ -144,12 +142,9 @@ public abstract class JsonSchemaGenerator {
     }
 
     /**
-     * Checks whether the type is SimpleType (mapped by
-     * {@link SimpleTypeMappings}), Collection or Iterable (for mapping arrays),
-     * Void type (returning null), or custom Class (for mapping objects).
+     * Checks whether the type is SimpleType (mapped by {@link SimpleTypeMappings}), Collection or Iterable (for mapping arrays), Void type (returning null), or
+     * custom Class (for mapping objects).
      *
-     * @param type
-     * @param schema
      * @return the full schema represented as an ObjectNode.
      */
     protected <T> ObjectNode checkAndProcessType(Class<T> type, ObjectNode schema) throws TypeException {
@@ -181,8 +176,6 @@ public abstract class JsonSchemaGenerator {
     /**
      * Generates the schema of custom java types
      *
-     * @param type
-     * @param schema
      * @return the full schema of custom java types
      */
     protected <T> ObjectNode processCustomType(Class<T> type, ObjectNode schema) throws TypeException {
@@ -192,7 +185,7 @@ public abstract class JsonSchemaGenerator {
 
         if (config.processFieldsOnly()) {
             // Process fields only
-            processFields(type,schema);
+            processFields(type, schema);
         } else {
             // Generate the schemas of type's properties
             processProperties(type, schema);
@@ -205,9 +198,6 @@ public abstract class JsonSchemaGenerator {
 
     /**
      * Generates the schema of collections java types
-     *
-     * @param type
-     * @param schema
      */
     private <T> void checkAndProcessCollection(Class<T> type, ObjectNode schema) throws TypeException {
         // If the type extends from AbstracctCollection, then it is considered
@@ -267,7 +257,7 @@ public abstract class JsonSchemaGenerator {
             if (!ParameterizedType.class.isAssignableFrom(methodType.getClass())) {
                 throw new TypeException("Collection property must be parameterized: " + method.getName());
             }
-            ParameterizedType genericType = (ParameterizedType)methodType;
+            ParameterizedType genericType = (ParameterizedType) methodType;
             genericClass = (Class<?>) genericType.getActualTypeArguments()[0];
         } else {
             genericClass = field.getClass();
@@ -291,10 +281,10 @@ public abstract class JsonSchemaGenerator {
             }
         }
     }
-    
+
     protected <T> void processFields(Class<T> type, ObjectNode schema) throws TypeException {
         List<Field> props = findFields(type);
-        
+
         for (Field field : props) {
             ObjectNode prop = generatePropertySchema(type, null, field);
             if (prop != null && field != null) {
@@ -305,12 +295,13 @@ public abstract class JsonSchemaGenerator {
 
     protected <T> ObjectNode generatePropertySchema(Class<T> type, Method method, Field field) throws TypeException {
         Class<?> returnType = method != null ? method.getReturnType() : field.getType();
-        
+
         AccessibleObject propertyReflection = field != null ? field : method;
 
         SchemaIgnore ignoreAnn = propertyReflection.getAnnotation(SchemaIgnore.class);
-        if (ignoreAnn != null)
+        if (ignoreAnn != null) {
             return null;
+        }
 
         ObjectNode schema = createInstance();
 
@@ -369,7 +360,6 @@ public abstract class JsonSchemaGenerator {
             }
         }
 
-
         if (Collection.class.isAssignableFrom(returnType)) {
             processPropertyCollection(method, field, schema);
         } else {
@@ -382,9 +372,9 @@ public abstract class JsonSchemaGenerator {
 
         Optional<AttributeHolder> fieldAttributes = AttributeHolder.locate(propertyReflection);
         if (fieldAttributes.isPresent()) {
-                processSchemaProperty(schema, fieldAttributes.get());
-                // The declaration of $schema is only necessary at the root object
-                schema.remove("$schema");
+            processSchemaProperty(schema, fieldAttributes.get());
+            // The declaration of $schema is only necessary at the root object
+            schema.remove("$schema");
         }
 
         // Check if the Nullable annotation is present, and if so, add 'null' to type attr
@@ -404,8 +394,8 @@ public abstract class JsonSchemaGenerator {
     }
 
     private void addPropertyToSchema(ObjectNode schema, Field field,
-                                     Method method, ObjectNode prop) {
-        
+            Method method, ObjectNode prop) {
+
         String name = getPropertyName(field, method);
         if (prop.has("selfRequired")) {
             ArrayNode requiredNode;
@@ -417,8 +407,9 @@ public abstract class JsonSchemaGenerator {
             requiredNode.add(name);
             prop.remove("selfRequired");
         }
-        if (!schema.has(TAG_PROPERTIES))
+        if (!schema.has(TAG_PROPERTIES)) {
             schema.putObject(TAG_PROPERTIES);
+        }
         ((ObjectNode) schema.get(TAG_PROPERTIES)).put(name, prop);
     }
 
@@ -428,13 +419,9 @@ public abstract class JsonSchemaGenerator {
     }
 
     /**
-     * If the Java Type inherits from other Java Type but Object, then it is
-     * assumed to inherit from other custom type. In this case, the parent class
-     * is processed as well and merged with the child class, having the child a
-     * high priority when both have same attributes filled.
+     * If the Java Type inherits from other Java Type but Object, then it is assumed to inherit from other custom type. In this case, the parent class is
+     * processed as well and merged with the child class, having the child a high priority when both have same attributes filled.
      *
-     * @param type
-     * @param schema
      * @return The actual schema merged with its parent schema (if it exists)
      */
     protected <T> ObjectNode mergeWithParent(Class<T> type, ObjectNode schema) throws TypeException {
@@ -449,13 +436,13 @@ public abstract class JsonSchemaGenerator {
     /**
      * Merges two schemas.
      *
-     * @param parent                   A parent schema considering inheritance
-     * @param child                    A child schema considering inheritance
+     * @param parent A parent schema considering inheritance
+     * @param child A child schema considering inheritance
      * @param overwriteChildProperties A boolean to check whether properties (from parent or child) must have higher priority
      * @return The tow schemas merged
      */
     protected ObjectNode mergeSchema(ObjectNode parent, ObjectNode child,
-                                     boolean overwriteChildProperties) {
+            boolean overwriteChildProperties) {
         Iterator<String> namesIterator = child.fieldNames();
 
         if (overwriteChildProperties) {
@@ -498,7 +485,7 @@ public abstract class JsonSchemaGenerator {
     }
 
     protected void overwriteProperty(ObjectNode parent, ObjectNode child,
-                                     String propertyName) {
+            String propertyName) {
         if (child.has(propertyName)) {
             parent.put(propertyName, child.get(propertyName));
         }
@@ -506,9 +493,6 @@ public abstract class JsonSchemaGenerator {
 
     /**
      * Utility method to find properties from a Java Type following Beans Convention.
-     *
-     * @param type
-     * @return
      */
     private <T> HashMap<Method, Field> findProperties(Class<T> type) {
         Field[] fields = type.getDeclaredFields();
@@ -548,7 +532,7 @@ public abstract class JsonSchemaGenerator {
                     if (config.processAnnotatedOnly() && !attributeHolder.isPresent()) {
                         process = false;
                     }
-                            
+
                     if (process && field.getName().equalsIgnoreCase(name)) {
                         props.put(method, field);
                         hasField = true;
@@ -562,7 +546,7 @@ public abstract class JsonSchemaGenerator {
         }
         return props;
     }
-    
+
     private <T> List<Field> findFields(Class<T> type) {
         Field[] fields = type.getDeclaredFields();
         if (config.sortSchemaProperties()) {

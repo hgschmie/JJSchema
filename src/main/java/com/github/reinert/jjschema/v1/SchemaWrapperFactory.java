@@ -18,7 +18,6 @@
 
 package com.github.reinert.jjschema.v1;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.reinert.jjschema.ManagedReference;
 import com.github.reinert.jjschema.SimpleTypeMappings;
@@ -33,7 +32,8 @@ import java.util.Set;
 
 public class SchemaWrapperFactory {
 
-    private SchemaWrapperFactory() {}
+    private SchemaWrapperFactory() {
+    }
 
     public static SchemaWrapper createWrapper(JsonNodeFactory nodeFactory, Type propertyType) {
         return createWrapper(nodeFactory, propertyType, null);
@@ -47,7 +47,8 @@ public class SchemaWrapperFactory {
         return createWrapper(nodeFactory, propertyType, managedReferences, null, false);
     }
 
-    public static SchemaWrapper createWrapper(JsonNodeFactory nodeFactory, Type type, Set<ManagedReference> managedReferences, String relativeId, boolean ignoreProperties) {
+    public static SchemaWrapper createWrapper(JsonNodeFactory nodeFactory, Type type, Set<ManagedReference> managedReferences, String relativeId,
+            boolean ignoreProperties) {
         // If it is void then return null
         if (type == Void.class || type == void.class || type == null) {
             return new NullSchemaWrapper(nodeFactory, type);
@@ -57,26 +58,30 @@ public class SchemaWrapperFactory {
             return new SimpleSchemaWrapper(nodeFactory, type);
         }
         // If it is an Enum than process like enum
-        else if (type instanceof Class && ((Class<?>)type).isEnum()) {
+        else if (type instanceof Class && ((Class<?>) type).isEnum()) {
             return new EnumSchemaWrapper(nodeFactory, (Class<?>) type);
         }
         // If none of the above possibilities were true, then it is a custom object
         else {
-            if (managedReferences != null)
-                if (relativeId != null)
+            if (managedReferences != null) {
+                if (relativeId != null) {
                     return new CustomSchemaWrapper(nodeFactory, type, managedReferences, relativeId, ignoreProperties);
-                else
+                } else {
                     return new CustomSchemaWrapper(nodeFactory, type, managedReferences, ignoreProperties);
-            else
+                }
+            } else {
                 return new CustomSchemaWrapper(nodeFactory, type, ignoreProperties);
+            }
         }
     }
 
-    public static SchemaWrapper createArrayWrapper(JsonNodeFactory nodeFactory, Class<?> type, Class<?> parametrizedType, Set<ManagedReference> managedReferences, boolean ignoreProperties) {
+    public static SchemaWrapper createArrayWrapper(JsonNodeFactory nodeFactory, Class<?> type, Class<?> parametrizedType,
+            Set<ManagedReference> managedReferences, boolean ignoreProperties) {
         return new ArraySchemaWrapper(nodeFactory, type, parametrizedType, managedReferences, ignoreProperties);
     }
 
-    public static SchemaWrapper createArrayWrapper(JsonNodeFactory nodeFactory, Class<?> type, Type propertyType, Set<ManagedReference> managedReferences, String relativeId, boolean ignoreProperties) {
+    public static SchemaWrapper createArrayWrapper(JsonNodeFactory nodeFactory, Class<?> type, Type propertyType, Set<ManagedReference> managedReferences,
+            String relativeId, boolean ignoreProperties) {
         return new ArraySchemaWrapper(nodeFactory, type, propertyType, managedReferences, relativeId, ignoreProperties);
     }
 

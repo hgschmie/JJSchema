@@ -40,9 +40,6 @@ public class EnumTest extends TestCase {
 
     /**
      * Test if @Nullable works at Collection Types
-     *
-     * @throws com.fasterxml.jackson.core.JsonProcessingException
-     *
      */
     public void testGenerateSchema() throws IOException {
 

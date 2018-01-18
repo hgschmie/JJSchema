@@ -18,7 +18,15 @@
 
 package com.github.reinert.jjschema;
 
-import java.util.*;
+import java.util.AbstractCollection;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Mapping of builtin Java types to their matching JSON Schema primitive type
@@ -49,8 +57,9 @@ public enum CollectionTypeMappings {
         // Class objects are all singletons, so we can use that
         MAPPINGS = new IdentityHashMap<Class<?>, String>();
 
-        for (final CollectionTypeMappings mapping : values())
+        for (final CollectionTypeMappings mapping : values()) {
             MAPPINGS.put(mapping.c, mapping.schemaType);
+        }
     }
 
     private final Class<?> c;

@@ -22,7 +22,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.reinert.jjschema.SchemaIgnoreProperties;
-
 import junit.framework.TestCase;
 
 /**
@@ -50,6 +49,7 @@ public class SchemaIgnorePropertiesTest extends TestCase {
     }
 
     static class ItemWrapper {
+
         int id;
         @SchemaIgnoreProperties
         Item item;
@@ -72,6 +72,7 @@ public class SchemaIgnorePropertiesTest extends TestCase {
     }
 
     static class Item {
+
         int itemId;
         String itemName;
 

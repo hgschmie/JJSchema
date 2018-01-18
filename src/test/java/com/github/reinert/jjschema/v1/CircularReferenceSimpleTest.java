@@ -54,6 +54,7 @@ public class CircularReferenceSimpleTest extends TestCase {
 
     @JsonSchema(id = "#sale")
     static class Sale {
+
         int id;
         @JsonManagedReference
         List<SaleItem> saleItems;
@@ -76,6 +77,7 @@ public class CircularReferenceSimpleTest extends TestCase {
     }
 
     static class SaleItem {
+
         int idSale;
         int seqNumber;
         @JsonBackReference

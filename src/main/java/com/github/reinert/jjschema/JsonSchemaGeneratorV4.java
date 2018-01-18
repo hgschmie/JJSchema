@@ -21,7 +21,6 @@ package com.github.reinert.jjschema;
 import static com.github.reinert.jjschema.JJSchemaUtil.processCommonAttributes;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.v1.SchemaWrapper;
 

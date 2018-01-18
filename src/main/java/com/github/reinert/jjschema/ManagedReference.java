@@ -54,33 +54,44 @@ public class ManagedReference {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         ManagedReference other = (ManagedReference) obj;
         if (collectionType == null) {
-            if (other.collectionType != null)
+            if (other.collectionType != null) {
                 return false;
-        } else if (!collectionType.getName().equals(other.collectionType.getName()))
+            }
+        } else if (!collectionType.getName().equals(other.collectionType.getName())) {
             return false;
+        }
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.equals(other.name))
+            }
+        } else if (!name.equals(other.name)) {
             return false;
+        }
         if (type == null) {
-            if (other.type != null)
+            if (other.type != null) {
                 return false;
-        } else if (!type.getTypeName().equals(other.type.getTypeName()))
+            }
+        } else if (!type.getTypeName().equals(other.type.getTypeName())) {
             return false;
+        }
         if (backwardType == null) {
-            if (other.backwardType != null)
+            if (other.backwardType != null) {
                 return false;
-        } else if (!backwardType.getTypeName().equals(other.backwardType.getTypeName()))
+            }
+        } else if (!backwardType.getTypeName().equals(other.backwardType.getTypeName())) {
             return false;
+        }
         return true;
     }
 

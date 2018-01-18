@@ -59,6 +59,7 @@ public class AdditionalPropertiesTest extends TestCase {
 
     @JsonSchema(title = "Sale Parent Schema", additionalProperties = false)
     static class Sale {
+
         int id;
 
         List<SaleItem> saleItems;
@@ -82,6 +83,7 @@ public class AdditionalPropertiesTest extends TestCase {
 
     @JsonSchema(title = "Sale Item Child Schema", additionalProperties = false)
     static class SaleItem {
+
         int idSale;
         String name;
 

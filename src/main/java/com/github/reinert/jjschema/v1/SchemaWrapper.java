@@ -18,20 +18,21 @@
 
 package com.github.reinert.jjschema.v1;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.Nullable;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 /**
  * @author Danilo Reinert
  */
 
 public abstract class SchemaWrapper {
+
     private final Type type;
     private final JsonNodeFactory nodeFactory;
     private final ObjectNode node;
@@ -74,11 +75,11 @@ public abstract class SchemaWrapper {
     }
 
     public ParameterizedType getParameterizedType() {
-    	return (ParameterizedType) ((type instanceof ParameterizedType) ? type : null);
+        return (ParameterizedType) ((type instanceof ParameterizedType) ? type : null);
     }
-    
-    public Class<?> getJavaType() {    	
-        return (Class<?>) ((type instanceof ParameterizedType) ? ( (ParameterizedType) type).getRawType() : type);
+
+    public Class<?> getJavaType() {
+        return (Class<?>) ((type instanceof ParameterizedType) ? ((ParameterizedType) type).getRawType() : type);
     }
 
     public boolean isEnumWrapper() {

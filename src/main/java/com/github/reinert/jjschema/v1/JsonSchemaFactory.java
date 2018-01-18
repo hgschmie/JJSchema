@@ -23,10 +23,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
- * Created with IntelliJ IDEA.
- * User: reinert
- * Date: 27/05/13
- * Time: 14:42
+ * Created with IntelliJ IDEA. User: reinert Date: 27/05/13 Time: 14:42
  *
  * @author Danilo Reinert
  */

@@ -22,11 +22,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.reinert.jjschema.JsonSchema;
-import com.github.reinert.jjschema.JsonSchema;
 import com.github.reinert.jjschema.exception.UnavailableVersion;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-
 import junit.framework.TestCase;
 
 import java.io.IOException;
@@ -46,20 +44,17 @@ public class ProductTest extends TestCase {
     }
 
     /**
-     * Test the scheme generate following a scheme source, avaliable at
-     * http://json-schema.org/example1.html the output should match the example.
-     *
-     * @throws java.io.IOException
+     * Test the scheme generate following a scheme source, avaliable at http://json-schema.org/example1.html the output should match the example.
      */
     public void testProductSchema() throws UnavailableVersion, IOException {
         JsonNode productSchema = schemaFactory.createSchema(Product.class);
-        
+
         String expectedResult = CharStreams.toString(new InputStreamReader(
-       		 Thread.currentThread().getContextClassLoader().getResourceAsStream("product_schema.json"), Charsets.UTF_8));
+                Thread.currentThread().getContextClassLoader().getResourceAsStream("product_schema.json"), Charsets.UTF_8));
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualObj = mapper.readTree(expectedResult);
-        
+
         assertEquals(productSchema, actualObj);
 
         //TODO: Add support to custom Iterable classes?

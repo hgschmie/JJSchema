@@ -39,19 +39,15 @@ public class SimpleExampleTest {
     JsonSchemaFactory schemaFactory = new JsonSchemaV4Factory();
 
     /**
-     * Test the scheme generate following a scheme source, avaliable at
-     * http://json-schema.org/examples.html the output should match the example.
-     *
-     * @throws java.io.IOException
-     * @throws com.fasterxml.jackson.core.JsonProcessingException
-     *
+     * Test the scheme generate following a scheme source, avaliable at http://json-schema.org/examples.html the output should match the example.
      */
     @Test
     public void testGenerateSchema() throws UnavailableVersion, JsonProcessingException, IOException {
 
         final InputStream in = SimpleExampleTest.class.getResourceAsStream("/simple_example.json");
-        if (in == null)
+        if (in == null) {
             throw new IOException("resource not found");
+        }
         JsonNode fromResource = MAPPER.readTree(in);
         JsonNode fromJavaType = schemaFactory.createSchema(SimpleExample.class);
 
@@ -60,6 +56,7 @@ public class SimpleExampleTest {
 
     @JsonSchema(title = "Example Schema")
     static class SimpleExample {
+
         @JsonSchema(required = true)
         private String firstName;
         @JsonSchema(required = true)
