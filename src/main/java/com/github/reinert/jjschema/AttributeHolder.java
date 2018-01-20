@@ -5,6 +5,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.annotations.JsonSchema;
 import com.github.reinert.jjschema.annotations.Nullable;
 import com.github.reinert.jjschema.annotations.SchemaIgnore;
@@ -16,10 +18,6 @@ import java.lang.reflect.AnnotatedElement;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.OptionalInt;
-
-/**
- * Collects all attributes discovered from the various annotations.
- */
 
 @AutoValue
 public abstract class AttributeHolder {
@@ -273,6 +271,46 @@ public abstract class AttributeHolder {
             additionalProperties(jsonSchema.additionalProperties());
 
             return this;
+        }
+    }
+
+    void augmentCommonAttributes(ObjectNode node) {
+        id().ifPresent(id -> node.put("id", id));
+        description().ifPresent(description -> node.put("description", description));
+        pattern().ifPresent(pattern -> node.put("pattern", pattern));
+        format().ifPresent(format -> node.put("format", format));
+        title().ifPresent(title -> node.put("title", title));
+        maximum().ifPresent(maximum -> node.put("maximum", maximum));
+
+        if (exclusiveMaximum()) {
+            node.put("exclusiveMaximum", true);
+        }
+
+        minimum().ifPresent(minimum -> node.put("minimum", minimum));
+
+        if (exclusiveMinimum()) {
+            node.put("exclusiveMinimum", true);
+        }
+
+        if (!enums().isEmpty()) {
+            ArrayNode enumArray = node.putArray("enum");
+            for (String v : enums()) {
+                enumArray.add(v);
+            }
+        }
+
+        if (uniqueItems()) {
+            node.put("uniqueItems", true);
+        }
+
+        minItems().ifPresent(minItems -> node.put("minItems", minItems));
+        maxItems().ifPresent(maxItems -> node.put("maxItems", maxItems));
+        multipleOf().ifPresent(multipleOf -> node.put("multipleOf", multipleOf));
+        minLength().ifPresent(minLength -> node.put("minLength", minLength));
+        maxLength().ifPresent(maxLength -> node.put("maxLength", maxLength));
+
+        if (readonly()) {
+            node.put("readonly", true);
         }
     }
 }

@@ -18,7 +18,6 @@
 
 package com.github.reinert.jjschema;
 
-import static com.github.reinert.jjschema.JJSchemaUtil.processCommonAttributes;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
@@ -260,7 +259,7 @@ public final class JsonSchemaGenerator {
     }
 
     private void augmentAttributes(ObjectNode schema, Type type, AttributeHolder schemaAttributes) {
-        processCommonAttributes(schema, schemaAttributes);
+        schemaAttributes.augmentCommonAttributes(schema);
         schemaAttributes.$ref().ifPresent($ref -> schema.put("$ref", $ref));
 
         if (!schemaAttributes.additionalProperties()) {

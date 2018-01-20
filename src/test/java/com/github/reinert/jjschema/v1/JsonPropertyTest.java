@@ -4,21 +4,19 @@ import static com.github.reinert.jjschema.TestUtility.generateSchema;
 import static com.github.reinert.jjschema.TestUtility.testProperties;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import org.junit.Test;
 
 public class JsonPropertyTest {
 
-    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private final JsonSchemaGenerator schemaGenerator = JsonSchemaGeneratorBuilder.draftV4Schema().build();
 
     @Test
     public void testJsonPropertyFromMethod() throws Exception {
 
-        JsonSchemaGenerator generator = SchemaGeneratorBuilder.draftV4Schema().build();
+        JsonSchemaGenerator generator = JsonSchemaGeneratorBuilder.draftV4Schema().build();
 
         ObjectNode schema = generateSchema(generator, TestClass.class);
         testProperties(schema, "theOptionalProperty", "theRequiredProperty");
@@ -27,7 +25,7 @@ public class JsonPropertyTest {
     @Test
     public void testJsonPropertyFromField() throws Exception {
 
-        JsonSchemaGenerator generator = SchemaGeneratorBuilder.draftV4Schema()
+        JsonSchemaGenerator generator = JsonSchemaGeneratorBuilder.draftV4Schema()
                 .disableProcessProperties()
                 .processFields()
                 .build();
@@ -39,7 +37,7 @@ public class JsonPropertyTest {
     @Test
     public void testJsonPropertyAll() throws Exception {
 
-        JsonSchemaGenerator generator = SchemaGeneratorBuilder.draftV4Schema()
+        JsonSchemaGenerator generator = JsonSchemaGeneratorBuilder.draftV4Schema()
                 .processFields()
                 .build();
 
@@ -50,7 +48,7 @@ public class JsonPropertyTest {
     @Test
     public void testJsonPropertyNone() throws Exception {
 
-        JsonSchemaGenerator generator = SchemaGeneratorBuilder.draftV4Schema()
+        JsonSchemaGenerator generator = JsonSchemaGeneratorBuilder.draftV4Schema()
                 .disableProcessProperties()
                 .build();
 
@@ -61,7 +59,7 @@ public class JsonPropertyTest {
     @Test
     public void testJsonPropertyNamed() throws Exception {
 
-        JsonSchemaGenerator generator = SchemaGeneratorBuilder.draftV4Schema()
+        JsonSchemaGenerator generator = JsonSchemaGeneratorBuilder.draftV4Schema()
                 .processFields()
                 .build();
         ObjectNode schema = generateSchema(generator, TestNamedClass.class);

@@ -29,15 +29,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
-import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +41,7 @@ import java.util.Set;
 
 public class ProductTest {
 
-    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private final JsonSchemaGenerator schemaGenerator = JsonSchemaGeneratorBuilder.draftV4Schema().build();
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private final ObjectWriter om = MAPPER.writerWithDefaultPrettyPrinter();
 

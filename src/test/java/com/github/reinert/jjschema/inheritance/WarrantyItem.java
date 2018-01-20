@@ -20,7 +20,6 @@ package com.github.reinert.jjschema.inheritance;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-//TODO: Extend BaseItem to demonstrate the problem
 public class WarrantyItem extends BaseItem {
 
     private String type;

@@ -24,19 +24,15 @@ import static org.junit.Assert.assertNotNull;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * @author reinert
- */
 public class SimpleExampleTest {
 
-    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().removeSchemaVersion().build();
+    private final JsonSchemaGenerator schemaGenerator = JsonSchemaGeneratorBuilder.draftV4Schema().removeSchemaVersion().build();
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**

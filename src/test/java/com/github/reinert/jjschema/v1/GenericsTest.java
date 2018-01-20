@@ -9,20 +9,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
-import junit.framework.TestCase;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-/**
- * @author lordvlad
- */
 public class GenericsTest {
 
-    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().removeSchemaVersion().build();
+    private final JsonSchemaGenerator schemaGenerator = JsonSchemaGeneratorBuilder.draftV4Schema().removeSchemaVersion().build();
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**

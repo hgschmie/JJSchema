@@ -28,15 +28,11 @@ import static org.junit.Assert.assertEquals;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import org.junit.Test;
 
-/**
- * @author Danilo Reinert
- */
-
 public class InheritanceTest {
-    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private final JsonSchemaGenerator schemaGenerator = JsonSchemaGeneratorBuilder.draftV4Schema().build();
 
     @Test
     public void testGenerateSchema() throws JsonProcessingException {

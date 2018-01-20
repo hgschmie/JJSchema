@@ -24,19 +24,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.SchemaIgnore;
 import org.junit.Test;
 
 import java.util.List;
 
-/**
- * @author reinert
- */
 public class SchemaIgnoreTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private final JsonSchemaGenerator schemaGenerator = JsonSchemaGeneratorBuilder.draftV4Schema().build();
 
     /**
      * Test if @SchemaIgnore works correctly

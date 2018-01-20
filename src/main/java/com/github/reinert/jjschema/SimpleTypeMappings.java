@@ -20,7 +20,6 @@ package com.github.reinert.jjschema;
 
 import com.google.common.reflect.TypeToken;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -33,12 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Mapping of builtin Java types to their matching JSON Schema primitive type
- *
- * @author fge
- */
-public enum SimpleTypeMappings {
+enum SimpleTypeMappings {
     // Integer types
     PRIMITIVE_BYTE(byte.class, "integer"),
     PRIMITIVE_SHORT(short.class, "integer"),
@@ -68,6 +62,8 @@ public enum SimpleTypeMappings {
     LOCALDATE(LocalDate.class, "string"),
     INSTANT(Instant.class, "string");
 
+    private static final Class[] COLLECTION_CLASSES = new Class[]{Collection.class, Iterable.class};
+
     private static final Map<Class<?>, String> MAPPINGS;
 
     static {
@@ -87,13 +83,7 @@ public enum SimpleTypeMappings {
         this.schemaType = schemaType;
     }
 
-    /**
-     * Return a primitive type for a given class, if any
-     *
-     * @param type the class
-     * @return the primitive type if found, {@code null} otherwise
-     */
-    public static Optional<String> forClass(final Type type) {
+    static Optional<String> forClass(final Type type) {
         if (!(type instanceof Class)) {
             return Optional.empty();
         } else if (MAPPINGS.containsKey(type)) {
@@ -103,8 +93,7 @@ public enum SimpleTypeMappings {
         }
     }
 
-    private static Class [] COLLECTION_CLASSES = new Class[] {Collection.class, Iterable.class};
-    public static boolean isCollectionLike(Type type) {
+    static boolean isCollectionLike(Type type) {
         TypeToken token = TypeToken.of(type);
         for (Class collectionClass : COLLECTION_CLASSES) {
             if (collectionClass.isAssignableFrom(token.getRawType())) {
@@ -112,15 +101,5 @@ public enum SimpleTypeMappings {
             }
         }
         return false;
-    }
-
-    /**
-     * Informs which the given type is some Java default type
-     *
-     * @param type the class
-     * @return true if c is a Java default Ype, false otherwise
-     */
-    public static boolean isSimpleType(final Type type) {
-        return forClass(type) != null;
     }
 }

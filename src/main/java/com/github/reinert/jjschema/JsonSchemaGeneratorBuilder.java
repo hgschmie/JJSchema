@@ -23,9 +23,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import java.util.function.Function;
 
-public final class SchemaGeneratorBuilder {
+public final class JsonSchemaGeneratorBuilder {
 
-    private SchemaGeneratorBuilder() {
+    private JsonSchemaGeneratorBuilder() {
     }
 
     public static JsonSchemaGeneratorConfigurationBuilder draftV4Schema() {

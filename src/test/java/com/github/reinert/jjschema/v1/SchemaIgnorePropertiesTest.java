@@ -25,21 +25,16 @@ import static org.junit.Assert.assertFalse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.SchemaIgnoreProperties;
-import junit.framework.TestCase;
 import org.junit.Test;
 
-/**
- * @author reinert
- */
 public class SchemaIgnorePropertiesTest {
 
-    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private final JsonSchemaGenerator schemaGenerator = JsonSchemaGeneratorBuilder.draftV4Schema().build();
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**

@@ -28,22 +28,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
 import org.junit.Test;
-
-import java.util.List;
-import java.util.Map;
 
 public class EmployeeTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private final JsonSchemaGenerator schemaGenerator = JsonSchemaGeneratorBuilder.draftV4Schema().build();
     private final ObjectWriter ow = MAPPER.writerWithDefaultPrettyPrinter();
 
     @SuppressWarnings({"unchecked", "rawtypes"})

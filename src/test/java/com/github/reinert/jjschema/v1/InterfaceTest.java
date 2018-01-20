@@ -25,24 +25,19 @@ import static com.github.reinert.jjschema.TestUtility.testPropertyType;
 import static com.github.reinert.jjschema.TestUtility.testRequired;
 import static com.github.reinert.jjschema.TestUtility.testWithProperties;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
 import com.github.reinert.jjschema.annotations.Nullable;
-import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.time.Instant;
 
-/**
- * @author reinert
- */
 public class InterfaceTest {
 
-    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private final JsonSchemaGenerator schemaGenerator = JsonSchemaGeneratorBuilder.draftV4Schema().build();
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**

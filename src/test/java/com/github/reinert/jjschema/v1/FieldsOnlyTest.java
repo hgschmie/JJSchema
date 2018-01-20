@@ -5,19 +5,13 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
-import junit.framework.TestCase;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Map;
-
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class FieldsOnlyTest {
 
     private final ObjectMapper MAPPER = new ObjectMapper();
@@ -54,7 +48,7 @@ public class FieldsOnlyTest {
 
     @Test
     public void testFieldsOnly() throws Exception {
-        JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
+        JsonSchemaGenerator v4generator = JsonSchemaGeneratorBuilder.draftV4Schema()
                 .processFields()
                 .disableProcessProperties()
                 .build();
@@ -65,7 +59,7 @@ public class FieldsOnlyTest {
 
     @Test
     public void testNoSortedFields() throws Exception {
-        JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
+        JsonSchemaGenerator v4generator = JsonSchemaGeneratorBuilder.draftV4Schema()
                 .processFields()
                 .disableProcessProperties()
                 .disableSortSchemaProperties()

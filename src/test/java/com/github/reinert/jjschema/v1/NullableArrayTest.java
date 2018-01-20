@@ -24,23 +24,18 @@ import static com.github.reinert.jjschema.TestUtility.testWithProperties;
 import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
-import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import com.github.reinert.jjschema.JsonSchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.Nullable;
-import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.util.List;
 
-/**
- * @author reinert
- */
 public class NullableArrayTest {
 
-    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private final JsonSchemaGenerator schemaGenerator = JsonSchemaGeneratorBuilder.draftV4Schema().build();
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
