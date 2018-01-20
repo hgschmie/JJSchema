@@ -1,17 +1,24 @@
 package com.github.reinert.jjschema.v1;
 
+import static com.github.reinert.jjschema.TestUtility.testProperties;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.reinert.jjschema.JsonSchemaGenerator;
 import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Map;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class FieldsOnlyTest extends TestCase {
+public class FieldsOnlyTest {
 
     private final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -20,8 +27,10 @@ public class FieldsOnlyTest extends TestCase {
         @JsonSchema(required = true, minLength = 5, maxLength = 50, description = "Name")
         private String name;
 
+        @JsonProperty
         public String lastName;
 
+        @JsonProperty
         public String getName() {
             return name;
         }
@@ -30,8 +39,10 @@ public class FieldsOnlyTest extends TestCase {
             this.name = name;
         }
 
+        @JsonProperty
         private boolean retired;
 
+        @JsonProperty
         public boolean isRetired() {
             return retired;
         }
@@ -41,51 +52,26 @@ public class FieldsOnlyTest extends TestCase {
         }
     }
 
-    public void testAnnotatedFieldsOnly() throws Exception {
-        JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
-                .processFieldsOnly()
-                .processAnnotatedOnly()
-                .build();
-
-        JsonNode schemaNode = v4generator.generateSchema(Employee.class);
-
-        String str = MAPPER.writeValueAsString(schemaNode);
-        Map<String, Object> result = MAPPER.readValue(str, Map.class);
-        Map props = (Map) result.get(CustomSchemaWrapper.TAG_PROPERTIES);
-        assertEquals(1, props.size());
-    }
-
+    @Test
     public void testFieldsOnly() throws Exception {
         JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
-                .processFieldsOnly()
+                .processFields()
+                .disableProcessProperties()
                 .build();
 
-        JsonNode schemaNode = v4generator.generateSchema(Employee.class);
-
-        String str = MAPPER.writeValueAsString(schemaNode);
-        Map<String, Object> result = MAPPER.readValue(str, Map.class);
-        Map<String, String> props = (Map) result.get(CustomSchemaWrapper.TAG_PROPERTIES);
-        assertEquals(3, props.size());
-
-        // Check properties are sorted (default behaviour)
-        String[] keyArr = props.keySet().toArray(new String[0]);
-        assertTrue(Arrays.deepEquals(new String[]{"lastName", "name", "retired"}, keyArr));
+        ObjectNode schema = v4generator.generateSchema(Employee.class);
+        testProperties(schema, "lastName", "name", "retired");
     }
 
+    @Test
     public void testNoSortedFields() throws Exception {
         JsonSchemaGenerator v4generator = SchemaGeneratorBuilder.draftV4Schema()
-                .processFieldsOnly()
-                .dontSortSchemaProperties()
+                .processFields()
+                .disableProcessProperties()
+                .disableSortSchemaProperties()
                 .build();
 
-        JsonNode schemaNode = v4generator.generateSchema(Employee.class);
-
-        String str = MAPPER.writeValueAsString(schemaNode);
-        Map<String, Object> result = MAPPER.readValue(str, Map.class);
-        Map<String, String> props = (Map) result.get(CustomSchemaWrapper.TAG_PROPERTIES);
-        assertEquals(3, props.size());
-
-        String[] keyArr = props.keySet().toArray(new String[0]);
-        assertTrue(Arrays.deepEquals(new String[]{"name", "lastName", "retired"}, keyArr));
+        ObjectNode schema = v4generator.generateSchema(Employee.class);
+        testProperties(schema, "name", "retired", "lastName");
     }
 }

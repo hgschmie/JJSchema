@@ -18,6 +18,8 @@
 
 package com.github.reinert.jjschema.inheritance;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 //TODO: Extend BaseItem to demonstrate the problem
 public class WarrantyItem extends BaseItem {
 
@@ -25,6 +27,7 @@ public class WarrantyItem extends BaseItem {
     private long contractTermInMonths = 60;
     private boolean termsAndConditionsAccepted;
 
+    @JsonProperty
     public String getType() {
         return type;
     }
@@ -33,6 +36,7 @@ public class WarrantyItem extends BaseItem {
         this.type = type;
     }
 
+    @JsonProperty
     public boolean isTermsAndConditionsAccepted() {
         return termsAndConditionsAccepted;
     }
@@ -41,6 +45,7 @@ public class WarrantyItem extends BaseItem {
         this.termsAndConditionsAccepted = termsAndConditionsAccepted;
     }
 
+    @JsonProperty
     public long getContractTermInMonths() {
         return contractTermInMonths;
     }

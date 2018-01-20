@@ -1,8 +1,17 @@
 package com.github.reinert.jjschema.v1;
 
+import static com.github.reinert.jjschema.TestUtility.generateSchema;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.JsonSchemaGenerator;
+import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,27 +20,22 @@ import java.util.List;
 /**
  * @author lordvlad
  */
-public class GenericsTest extends TestCase {
+public class GenericsTest {
 
-    static ObjectMapper MAPPER = new ObjectMapper();
-    JsonSchemaFactory schemaFactory = new JsonSchemaV4Factory();
-
-    public GenericsTest(String testName) {
-        super(testName);
-    }
+    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().removeSchemaVersion().build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
      * Test generating a json schema for a class that uses generic types and a collection of generic types as properties. Expect the types to be resolved
      * instead of using "object" as property types.
      */
+    @Test
     public void testGenerateSchema() throws Exception {
 
         final InputStream in = SimpleExampleTest.class.getResourceAsStream("/generics_example.json");
-        if (in == null) {
-            throw new IOException("resource not found");
-        }
+        assertNotNull("stream not found", in);
         JsonNode fromResource = MAPPER.readTree(in);
-        JsonNode fromJavaType = schemaFactory.createSchema(GenericExample.class);
+        ObjectNode fromJavaType = generateSchema(schemaGenerator, GenericExample.class);
 
         assertEquals(fromResource, fromJavaType);
     }
@@ -41,10 +45,12 @@ public class GenericsTest extends TestCase {
         private A first;
         private B second;
 
+        @JsonProperty
         public A getFirst() {
             return first;
         }
 
+        @JsonProperty
         public B getSecond() {
             return second;
         }
@@ -63,6 +69,7 @@ public class GenericsTest extends TestCase {
         private Tuple<String, Integer> tuple;
         private List<Tuple<String, Boolean>> listOfTuples;
 
+        @JsonProperty
         public Tuple<String, Integer> getTuple() {
             return tuple;
         }
@@ -71,6 +78,7 @@ public class GenericsTest extends TestCase {
             this.tuple = tuple;
         }
 
+        @JsonProperty
         public List<Tuple<String, Boolean>> getListOfTuples() {
             return listOfTuples;
         }

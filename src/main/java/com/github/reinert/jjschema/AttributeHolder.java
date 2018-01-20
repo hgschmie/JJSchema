@@ -2,10 +2,13 @@ package com.github.reinert.jjschema;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.reinert.jjschema.annotations.JsonSchema;
 import com.github.reinert.jjschema.annotations.Nullable;
 import com.github.reinert.jjschema.annotations.SchemaIgnore;
+import com.github.reinert.jjschema.annotations.SchemaIgnoreProperties;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 
@@ -38,6 +41,9 @@ public abstract class AttributeHolder {
             if (jsonProperty.required()) {
                 builder.required(true);
             }
+            if (!jsonProperty.value().isEmpty()) {
+                builder.named(jsonProperty.value());
+            }
         }
 
         final SchemaIgnore schemaIgnore = element.getAnnotation(SchemaIgnore.class);
@@ -46,10 +52,28 @@ public abstract class AttributeHolder {
             builder.ignored(true);
         }
 
+        final SchemaIgnoreProperties schemaIgnoreProperties = element.getAnnotation(SchemaIgnoreProperties.class);
+        if (schemaIgnoreProperties != null) {
+            foundAnnotations = true;
+            builder.ignoredProperties(true);
+        }
+
         final Nullable nullable = element.getAnnotation(Nullable.class);
         if (nullable != null) {
             foundAnnotations = true;
             builder.nullable(true);
+        }
+
+        final JsonManagedReference jsonManagedReference = element.getAnnotation(JsonManagedReference.class);
+        if (jsonManagedReference != null) {
+            foundAnnotations = true;
+            builder.managedReference(jsonManagedReference.value());
+        }
+
+        final JsonBackReference jsonBackReference = element.getAnnotation(JsonBackReference.class);
+        if (jsonBackReference != null) {
+            foundAnnotations = true;
+            builder.backReference(jsonBackReference.value());
         }
 
         return foundAnnotations ? Optional.of(builder.build()) : Optional.empty();
@@ -64,6 +88,7 @@ public abstract class AttributeHolder {
                 .readonly(false)
                 .additionalProperties(true)
                 .ignored(false)
+                .ignoredProperties(false)
                 .nullable(false);
     }
 
@@ -109,7 +134,15 @@ public abstract class AttributeHolder {
 
     public abstract boolean ignored();
 
+    public abstract boolean ignoredProperties();
+
     public abstract boolean nullable();
+
+    public abstract Optional<String> named();
+
+    public abstract Optional<String> managedReference();
+
+    public abstract Optional<String> backReference();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -161,7 +194,15 @@ public abstract class AttributeHolder {
 
         public abstract Builder ignored(boolean ignored);
 
+        public abstract Builder ignoredProperties(boolean ignored);
+
         public abstract Builder nullable(boolean nullable);
+
+        public abstract Builder named(String name);
+
+        public abstract Builder managedReference(String managedReference);
+
+        public abstract Builder backReference(String backReference);
 
         public abstract AttributeHolder build();
 

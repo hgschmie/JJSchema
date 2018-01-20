@@ -26,21 +26,20 @@ import java.util.List;
 
 public class TaskList {
 
-    @JsonManagedReference
-    List<Task> taks;
-    @JsonBackReference
+    List<Task> tasks;
     Person creator;
-    @JsonBackReference("assigned")
     Collection<Person> assignedPersons;
 
-    public List<Task> getTaks() {
-        return taks;
+    @JsonManagedReference
+    public List<Task> getTasks() {
+        return tasks;
     }
 
-    public void setTaks(List<Task> taks) {
-        this.taks = taks;
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 
+    @JsonBackReference
     public Person getCreator() {
         return creator;
     }
@@ -49,6 +48,7 @@ public class TaskList {
         this.creator = creator;
     }
 
+    @JsonBackReference("assigned")
     public Collection<Person> getAssignedPersons() {
         return assignedPersons;
     }

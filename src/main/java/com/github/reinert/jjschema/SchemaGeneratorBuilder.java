@@ -29,7 +29,7 @@ public final class SchemaGeneratorBuilder {
     }
 
     public static JsonSchemaGeneratorConfigurationBuilder draftV4Schema() {
-        return new JsonSchemaGeneratorConfigurationBuilder(JsonNodeFactory.instance, config -> new JsonSchemaGeneratorV4(config));
+        return new JsonSchemaGeneratorConfigurationBuilder(JsonNodeFactory.instance, config -> new JsonSchemaGenerator(config));
     }
 
     public static class JsonSchemaGeneratorConfigurationBuilder {
@@ -47,13 +47,13 @@ public final class SchemaGeneratorBuilder {
             return this;
         }
 
-        public JsonSchemaGeneratorConfigurationBuilder dontSortSchemaProperties() {
-            builder.dontSortSchemaProperties();
+        public JsonSchemaGeneratorConfigurationBuilder disableSortSchemaProperties() {
+            builder.disableSortSchemaProperties();
             return this;
         }
 
-        public JsonSchemaGeneratorConfigurationBuilder dontProcessProperties() {
-            builder.dontProcessProperties();
+        public JsonSchemaGeneratorConfigurationBuilder disableProcessProperties() {
+            builder.disableProcessProperties();
             return this;
         }
 

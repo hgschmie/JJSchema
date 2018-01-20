@@ -18,33 +18,60 @@
 
 package com.github.reinert.jjschema.v1;
 
+import static com.github.reinert.jjschema.TestUtility.generateSchema;
+import static com.github.reinert.jjschema.TestUtility.testEnumValues;
+import static com.github.reinert.jjschema.TestUtility.testPropertyAttribute;
+import static com.github.reinert.jjschema.TestUtility.testPropertyType;
+import static com.github.reinert.jjschema.TestUtility.testRequired;
+import static com.github.reinert.jjschema.TestUtility.testWithProperties;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.JsonSchemaGenerator;
+import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
 import com.github.reinert.jjschema.annotations.Nullable;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.time.Instant;
 
 /**
  * @author reinert
  */
-public class InterfaceTest extends TestCase {
+public class InterfaceTest {
 
-    static ObjectMapper MAPPER = new ObjectMapper();
-    JsonSchemaFactory schemaFactory = new JsonSchemaV4Factory();
-
-    public InterfaceTest(String testName) {
-        super(testName);
-    }
+    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
      * Test the scheme generate following a scheme source, avaliable at http://json-schema.org/examples.html the output should match the example.
      */
+    @Test
     public void testGenerateSchema() throws Exception {
 
-        JsonNode fromJavaType = schemaFactory.createSchema(UserInterface.class);
-        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(fromJavaType));
+        ObjectNode fromJavaType = generateSchema(schemaGenerator, UserInterface.class);
+        ObjectNode properties = testWithProperties(fromJavaType, "birthday", "id", "name", "photo", "sex");
+
+        testPropertyType(properties,"id", "integer");
+        testPropertyAttribute(properties, "id", "title", "ID");
+        testPropertyAttribute(properties, "id", "minimum", 100000);
+        testPropertyAttribute(properties, "id", "maximum", 999999);
+
+        testPropertyType(properties,"name", "string");
+        testPropertyAttribute(properties, "name", "description", "User's name");
+
+        testPropertyType(properties,"sex", "string", "null");
+        testEnumValues(properties, "sex", "M", "F", null);
+
+        testPropertyType(properties,"photo", "object", "null");
+        testPropertyAttribute(properties, "photo", "description", "User's personal photo");
+
+        testPropertyType(properties,"birthday", "string");
+        testPropertyAttribute(properties, "birthday", "format", "date-time");
+
+        testRequired(fromJavaType, "id", "name");
     }
 
     interface UserInterface {

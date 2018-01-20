@@ -18,45 +18,50 @@
 
 package com.github.reinert.jjschema.v1;
 
+import static com.github.reinert.jjschema.TestUtility.generateSchema;
+import static com.github.reinert.jjschema.TestUtility.testPropertyType;
+import static com.github.reinert.jjschema.TestUtility.testWithProperties;
+import static org.junit.Assert.assertEquals;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.JsonSchemaGenerator;
+import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.Nullable;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.List;
 
 /**
  * @author reinert
  */
-public class NullableArrayTest extends TestCase {
+public class NullableArrayTest {
 
-    static ObjectMapper MAPPER = new ObjectMapper();
-    JsonSchemaFactory schemaFactory = new JsonSchemaV4Factory();
-
-    public NullableArrayTest(String testName) {
-        super(testName);
-    }
+    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
      * Test if @Nullable works at Collection Types
      */
+    @Test
     public void testGenerateSchema() {
 
-        JsonNode schema = schemaFactory.createSchema(Something.class);
-        System.out.println(schema);
+        ObjectNode schema = generateSchema(schemaGenerator, Something.class);
 
-        JsonNode expected = MAPPER.createArrayNode().add("array").add("null");
+        ObjectNode properties = testWithProperties(schema, "id", "names");
 
-        assertEquals(expected, schema.get("properties").get("names").get("type"));
-
-    }
+        testPropertyType(properties, "names", "array", "null");
+        }
 
     static class Something {
 
         private int id;
-        @Nullable
         private List<String> names;
 
+        @JsonProperty
         public int getId() {
             return id;
         }
@@ -65,6 +70,8 @@ public class NullableArrayTest extends TestCase {
             this.id = id;
         }
 
+        @Nullable
+        @JsonProperty
         public List<String> getNames() {
             return names;
         }

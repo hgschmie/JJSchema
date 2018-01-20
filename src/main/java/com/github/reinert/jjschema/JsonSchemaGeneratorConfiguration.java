@@ -42,7 +42,7 @@ public abstract class JsonSchemaGeneratorConfiguration {
             return setAddSchemaVersion(false);
         }
 
-        public Builder dontSortSchemaProperties() {
+        public Builder disableSortSchemaProperties() {
             return setSortSchemaProperties(false);
         }
 
@@ -50,7 +50,7 @@ public abstract class JsonSchemaGeneratorConfiguration {
             return setProcessFields(true);
         }
 
-        public Builder dontProcessProperties() {
+        public Builder disableProcessProperties() {
             return setProcessProperties(false);
         }
 

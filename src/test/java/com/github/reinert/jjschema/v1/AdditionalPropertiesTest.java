@@ -18,40 +18,44 @@
 
 package com.github.reinert.jjschema.v1;
 
+import static com.github.reinert.jjschema.TestUtility.generateSchema;
+import static com.github.reinert.jjschema.TestUtility.testProperties;
+import static com.github.reinert.jjschema.TestUtility.testWithProperties;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.JsonSchemaGenerator;
+import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.List;
 
 /**
  * @author manukura
  */
-public class AdditionalPropertiesTest extends TestCase {
+public class AdditionalPropertiesTest {
 
-    static ObjectMapper MAPPER = new ObjectMapper();
-    JsonSchemaFactory v4generator = new JsonSchemaV4Factory();
+    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public AdditionalPropertiesTest(String testName) {
-        super(testName);
-    }
-
+    @Test
     public void testGenerateSaleItemSchema() throws JsonProcessingException {
-        JsonNode schema = v4generator.createSchema(SaleItem.class);
-        // System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(schema));
-        JsonNode properties = schema.get("properties");
-        assertEquals(2, properties.size());
+        ObjectNode schema = generateSchema(schemaGenerator, SaleItem.class);
+        testProperties(schema, "idSale", "name");
         assertFalse(schema.get("additionalProperties").asBoolean());
     }
 
+    @Test
     public void testGenerateSaleSchema() throws JsonProcessingException {
-        JsonNode schema = v4generator.createSchema(Sale.class);
-        // System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(schema));
+        ObjectNode schema = generateSchema(schemaGenerator, Sale.class);
         assertFalse(schema.get("additionalProperties").asBoolean());
-        JsonNode properties = schema.get("properties");
-        assertEquals(2, properties.size());
+        ObjectNode properties = testWithProperties(schema, "id", "saleItems");
 
         // ensure additional properties is in the nested schema
         assertFalse(properties.findValue("additionalProperties").asBoolean());
@@ -64,6 +68,7 @@ public class AdditionalPropertiesTest extends TestCase {
 
         List<SaleItem> saleItems;
 
+        @JsonProperty
         public int getId() {
             return id;
         }
@@ -72,6 +77,7 @@ public class AdditionalPropertiesTest extends TestCase {
             this.id = id;
         }
 
+        @JsonProperty
         public List<SaleItem> getSaleItems() {
             return saleItems;
         }
@@ -87,6 +93,7 @@ public class AdditionalPropertiesTest extends TestCase {
         int idSale;
         String name;
 
+        @JsonProperty
         public int getIdSale() {
             return idSale;
         }
@@ -95,6 +102,7 @@ public class AdditionalPropertiesTest extends TestCase {
             this.idSale = idSale;
         }
 
+        @JsonProperty
         public String getName() {
             return name;
         }

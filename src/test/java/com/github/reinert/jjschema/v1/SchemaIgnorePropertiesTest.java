@@ -18,42 +18,53 @@
 
 package com.github.reinert.jjschema.v1;
 
+import static com.github.reinert.jjschema.TestUtility.testPropertyType;
+import static com.github.reinert.jjschema.TestUtility.testWithProperties;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.JsonSchemaGenerator;
+import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.SchemaIgnoreProperties;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * @author reinert
  */
-public class SchemaIgnorePropertiesTest extends TestCase {
+public class SchemaIgnorePropertiesTest {
 
-    static ObjectMapper MAPPER = new ObjectMapper();
-    JsonSchemaFactory v4generator = new JsonSchemaV4Factory();
-
-    public SchemaIgnorePropertiesTest(String testName) {
-        super(testName);
-    }
+    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
      * Test if @SchemaIgnore works correctly
      */
+    @Test
     public void testGenerateSchema() throws JsonProcessingException {
 
-        JsonNode schema = v4generator.createSchema(ItemWrapper.class);
-//        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(schema));
-        JsonNode item = schema.get("properties").get("item");
-        assertEquals("\"object\"", item.get("type").toString());
-        assertFalse(item.has("properties"));
+        ObjectNode schema = schemaGenerator.generateSchema(ItemWrapper.class);
+
+        ObjectNode properties = testWithProperties(schema, "id", "item");
+        testPropertyType(properties, "item", "object");
+
+        ObjectNode itemNode = (ObjectNode) properties.get("item");
+
+        assertFalse(itemNode.has("properties"));
     }
 
     static class ItemWrapper {
 
         int id;
-        @SchemaIgnoreProperties
+
         Item item;
 
+        @JsonProperty
         public int getId() {
             return id;
         }
@@ -62,6 +73,7 @@ public class SchemaIgnorePropertiesTest extends TestCase {
             this.id = id;
         }
 
+        @SchemaIgnoreProperties
         public Item getItem() {
             return item;
         }
@@ -77,6 +89,7 @@ public class SchemaIgnorePropertiesTest extends TestCase {
         String itemName;
 
 
+        @JsonProperty
         public int getItemId() {
             return itemId;
         }
@@ -85,6 +98,7 @@ public class SchemaIgnorePropertiesTest extends TestCase {
             this.itemId = itemId;
         }
 
+        @JsonProperty
         public String getItemName() {
             return itemName;
         }

@@ -18,50 +18,49 @@
 
 package com.github.reinert.jjschema.v1;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.databind.JsonNode;
+import static com.github.reinert.jjschema.TestUtility.testWithProperties;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.JsonSchemaGenerator;
+import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.SchemaIgnore;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.List;
 
 /**
  * @author reinert
  */
-public class SchemaIgnoreTest extends TestCase {
+public class SchemaIgnoreTest {
 
-    static ObjectMapper MAPPER = new ObjectMapper();
-    JsonSchemaFactory v4generator = new JsonSchemaV4Factory();
-
-    public SchemaIgnoreTest(String testName) {
-        super(testName);
-    }
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
 
     /**
      * Test if @SchemaIgnore works correctly
      */
-    public void testGenerateSchema() {
+    @Test
+    public void testGenerateSaleSchema() {
 
-        JsonNode schema = v4generator.createSchema(Sale.class);
-        //System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(schema));
-        JsonNode properties = schema.get("properties");
-        assertEquals(1, properties.size());
+        ObjectNode schema = schemaGenerator.generateSchema(Sale.class);
+        testWithProperties(schema, "id");
+    }
 
-        schema = v4generator.createSchema(SaleItem.class);
-        //System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(schema));
-        properties = schema.get("properties");
-        assertEquals(2, properties.size());
+    public void testGenerateSaleItemSchema() {
+
+        ObjectNode schema = schemaGenerator.generateSchema(SaleItem.class);
+        testWithProperties(schema, "idSale", "seqNumber");
     }
 
     static class Sale {
 
         int id;
-        @SchemaIgnore
-        @JsonManagedReference
+
         List<SaleItem> saleItems;
 
+        @JsonProperty
         public int getId() {
             return id;
         }
@@ -70,6 +69,8 @@ public class SchemaIgnoreTest extends TestCase {
             this.id = id;
         }
 
+        @SchemaIgnore
+        @JsonProperty
         public List<SaleItem> getSaleItems() {
             return saleItems;
         }
@@ -83,10 +84,9 @@ public class SchemaIgnoreTest extends TestCase {
 
         int idSale;
         int seqNumber;
-        @SchemaIgnore
-        @JsonBackReference
         Sale parent;
 
+        @JsonProperty
         public int getIdSale() {
             return idSale;
         }
@@ -95,6 +95,7 @@ public class SchemaIgnoreTest extends TestCase {
             this.idSale = idSale;
         }
 
+        @JsonProperty
         public int getSeqNumber() {
             return seqNumber;
         }
@@ -103,6 +104,8 @@ public class SchemaIgnoreTest extends TestCase {
             this.seqNumber = seqNumber;
         }
 
+        @SchemaIgnore
+        @JsonProperty
         public Sale getParent() {
             return parent;
         }

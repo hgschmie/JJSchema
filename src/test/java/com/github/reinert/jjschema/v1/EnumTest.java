@@ -18,53 +18,45 @@
 
 package com.github.reinert.jjschema.v1;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import static com.github.reinert.jjschema.TestUtility.testEnumValues;
+import static com.github.reinert.jjschema.TestUtility.generateSchema;
+import static com.github.reinert.jjschema.TestUtility.testWithProperties;
+import static org.junit.Assert.assertEquals;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.JsonSchemaGenerator;
+import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
 import com.github.reinert.jjschema.annotations.Nullable;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 /**
  * @author reinert
  */
-public class EnumTest extends TestCase {
+public class EnumTest {
 
-    static ObjectMapper MAPPER = new ObjectMapper();
-    JsonSchemaFactory schemaFactory = new JsonSchemaV4Factory();
-
-    public EnumTest(String testName) {
-        super(testName);
-    }
+    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
      * Test if @Nullable works at Collection Types
      */
+    @Test
     public void testGenerateSchema() throws IOException {
 
-        JsonNode schema = schemaFactory.createSchema(Hyperthing.class);
-        System.out.println(schema);
+        ObjectNode schema = generateSchema(schemaGenerator, Hyperthing.class);
 
-        JsonNode expected = MAPPER.createArrayNode().add("GET").add("POST").add("PUT").add("DELETE");
-        assertEquals(expected, schema.get("properties").get("method").get("enum"));
+        ObjectNode properties = testWithProperties(schema, "method", "resultCode", "floatingResultCode", "result");
 
-        expected = MAPPER.createArrayNode().add(404).add(401);
-        // This is a workaround because of Jackson's matching process.
-        // While for JSON schema there is difference only between integer numbers and floating numbers
-        // Jackson considers all Java Types as different (e.g. Long != Integer and Float != Double != BigDecimal)
-        // So, for correct testing, transform the generated schema to string resource than ask to
-        // Jackson's Processor to generate a JsonNode from this resource
-        JsonNode generated = MAPPER.readTree(schema.get("properties").get("resultCode").get("enum").toString());
-        assertEquals(expected, generated);
-
-        expected = MAPPER.createArrayNode().add(4.04).add(4.01);
-        // Same workaround as explained above
-        generated = MAPPER.readTree(schema.get("properties").get("floatingResultCode").get("enum").toString());
-        assertEquals(expected, generated);
-
-        expected = MAPPER.createArrayNode().add("NOT_FOUND").add("UNAUTHORIZED").add("null");
-        assertEquals(expected, schema.get("properties").get("result").get("enum"));
+        testEnumValues(properties, "method", "GET", "POST", "PUT", "DELETE");
+        testEnumValues(properties, "resultCode", 404L, 401L);
+        testEnumValues(properties, "floatingResultCode", new BigDecimal("4.04"), new BigDecimal("4.01"));
+        testEnumValues(properties, "result", "NOT_FOUND", "UNAUTHORIZED", null);
     }
 
     public enum IntegerEnum {
@@ -114,14 +106,12 @@ public class EnumTest extends TestCase {
 
     static class Hyperthing {
 
-        @JsonSchema(enums = {"GET", "POST", "PUT", "DELETE"})
         private String method;
         private IntegerEnum resultCode;
         private FloatingEnum floatingResultCode;
-        // Notice that JJSchema correctly adds "null" as an acceptable value in this case
-        @Nullable
         private SimpleEnum result;
 
+        @JsonSchema(enums = {"GET", "POST", "PUT", "DELETE"})
         public String getMethod() {
             return method;
         }
@@ -130,6 +120,7 @@ public class EnumTest extends TestCase {
             this.method = method;
         }
 
+        @JsonProperty
         public IntegerEnum getResultCode() {
             return resultCode;
         }
@@ -138,6 +129,7 @@ public class EnumTest extends TestCase {
             this.resultCode = resultCode;
         }
 
+        @JsonProperty
         public FloatingEnum getFloatingResultCode() {
             return floatingResultCode;
         }
@@ -146,6 +138,7 @@ public class EnumTest extends TestCase {
             this.floatingResultCode = floatingResultCode;
         }
 
+        @Nullable
         public SimpleEnum getResult() {
             return result;
         }

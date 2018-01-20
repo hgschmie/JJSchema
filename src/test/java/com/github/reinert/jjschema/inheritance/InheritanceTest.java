@@ -18,44 +18,42 @@
 
 package com.github.reinert.jjschema.inheritance;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.github.reinert.jjschema.v1.JsonSchemaFactory;
-import com.github.reinert.jjschema.v1.JsonSchemaV4Factory;
-import junit.framework.TestCase;
+import static com.github.reinert.jjschema.TestUtility.testPropertyAttribute;
+import static com.github.reinert.jjschema.TestUtility.generateSchema;
+import static com.github.reinert.jjschema.TestUtility.testProperties;
+import static com.github.reinert.jjschema.TestUtility.testRequired;
+import static com.github.reinert.jjschema.TestUtility.testWithProperties;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.JsonSchemaGenerator;
+import com.github.reinert.jjschema.SchemaGeneratorBuilder;
+import org.junit.Test;
 
 /**
  * @author Danilo Reinert
  */
 
-public class InheritanceTest extends TestCase {
+public class InheritanceTest {
+    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
 
-    static ObjectWriter WRITER = new ObjectMapper().writerWithDefaultPrettyPrinter();
-    JsonSchemaFactory schemaFactory = new JsonSchemaV4Factory();
-
-    /**
-     *
-     */
+    @Test
     public void testGenerateSchema() throws JsonProcessingException {
-        JsonNode generatedSchema = schemaFactory.createSchema(MusicItem.class);
-        System.out.println(WRITER.writeValueAsString(generatedSchema));
+        ObjectNode schema = generateSchema(schemaGenerator, MusicItem.class);
+        testProperties(schema, "artistName", "releaseYear", "price");
 
-        generatedSchema = schemaFactory.createSchema(WarrantyItem.class);
-        System.out.println(WRITER.writeValueAsString(generatedSchema));
+        schema = generateSchema(schemaGenerator, WarrantyItem.class);
+        testProperties(schema, "type", "termsAndConditionsAccepted", "contractTermInMonths");
     }
 
+    @Test
     public void testInheritedProperties() throws JsonProcessingException {
-        JsonNode generatedSchema = schemaFactory.createSchema(CollegeStudent.class);
-        System.out.println(WRITER.writeValueAsString(generatedSchema));
-        assertEquals(generatedSchema.get("properties").get("name").get("description").asText(), "student name");
-        Iterator<JsonNode> jsonNodeIterator = generatedSchema.get("required").iterator();
-        while (jsonNodeIterator.hasNext()) {
-            assertTrue(Arrays.asList("major", "name").contains(jsonNodeIterator.next().asText()));
-        }
+        ObjectNode schema = generateSchema(schemaGenerator, CollegeStudent.class);
+
+        ObjectNode properties = testWithProperties(schema, "name", "major");
+        testPropertyAttribute(properties, "name", "description", "student name");
+
+        testRequired(schema, "major", "name");
     }
 }

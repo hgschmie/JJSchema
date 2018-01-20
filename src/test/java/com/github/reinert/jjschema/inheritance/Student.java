@@ -4,9 +4,9 @@ import com.github.reinert.jjschema.annotations.JsonSchema;
 
 public class Student {
 
-    @JsonSchema(required = true, description = "student name")
     private String name;
 
+    @JsonSchema(required = true, description = "student name")
     public String getName() {
         return name;
     }

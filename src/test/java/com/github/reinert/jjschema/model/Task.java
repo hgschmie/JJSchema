@@ -19,13 +19,14 @@
 package com.github.reinert.jjschema.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Task {
 
     String text;
-    @JsonBackReference
     TaskList list;
 
+    @JsonProperty
     public String getText() {
         return text;
     }
@@ -34,6 +35,7 @@ public class Task {
         this.text = text;
     }
 
+    @JsonBackReference
     public TaskList getList() {
         return list;
     }

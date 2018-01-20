@@ -19,9 +19,12 @@
 package com.github.reinert.jjschema.v1;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.reinert.jjschema.JsonSchemaGenerator;
+import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
 import org.junit.Test;
 
@@ -33,8 +36,8 @@ import java.io.InputStream;
  */
 public class SimpleTest {
 
-    static ObjectMapper MAPPER = new ObjectMapper();
-    JsonSchemaFactory schemaFactory = new JsonSchemaV4Factory();
+    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().removeSchemaVersion().build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
      * Test the scheme generate following a scheme source, avaliable at http://json-schema.org/examples.html the output should match the example.
@@ -43,12 +46,10 @@ public class SimpleTest {
     public void testGenerateSchema() throws Exception {
 
         final InputStream in = SimpleTest.class.getResourceAsStream("/simple_example.json");
-        if (in == null) {
-            throw new IOException("resource not found");
-        }
+        assertNotNull("stream not found", in);
+
         JsonNode fromResource = MAPPER.readTree(in);
-        JsonNode fromJavaType = schemaFactory.createSchema(SimpleExample.class);
-        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(fromJavaType));
+        JsonNode fromJavaType = schemaGenerator.generateSchema(SimpleExample.class);
 
         assertEquals(fromResource, fromJavaType);
     }
@@ -56,13 +57,11 @@ public class SimpleTest {
     @JsonSchema(title = "Example Schema")
     static class SimpleExample {
 
-        @JsonSchema(required = true)
         private String firstName;
-        @JsonSchema(required = true)
         private String lastName;
-        @JsonSchema(description = "Age in years", minimum = 0)
         private int age;
 
+        @JsonSchema(required = true)
         public String getFirstName() {
             return firstName;
         }
@@ -71,6 +70,7 @@ public class SimpleTest {
             this.firstName = firstName;
         }
 
+        @JsonSchema(required = true)
         public String getLastName() {
             return lastName;
         }
@@ -79,6 +79,7 @@ public class SimpleTest {
             this.lastName = lastName;
         }
 
+        @JsonSchema(description = "Age in years", minimum = 0)
         public int getAge() {
             return age;
         }

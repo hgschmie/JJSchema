@@ -1,7 +1,7 @@
 {
+    "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "description": "A product from Acme's catalog",
-    "title": "Product",
+    "required": ["name", "id", "price"],
     "properties": {
         "id": {
             "type": "integer",
@@ -25,6 +25,6 @@
             "minItems": 1
         }
     },
-    "required": ["id", "name", "price"],
-    "$schema": "http://json-schema.org/draft-04/schema#"
+    "description": "A product from Acme's catalog",
+    "title": "Product"
 }

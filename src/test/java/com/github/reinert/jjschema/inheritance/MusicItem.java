@@ -18,6 +18,8 @@
 
 package com.github.reinert.jjschema.inheritance;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 
 public class MusicItem extends BaseItem {
@@ -26,6 +28,7 @@ public class MusicItem extends BaseItem {
     private String artistName;
     private String releaseYear;
 
+    @JsonProperty
     public String getArtistName() {
         return artistName;
     }
@@ -34,6 +37,7 @@ public class MusicItem extends BaseItem {
         this.artistName = artistName;
     }
 
+    @JsonProperty
     public String getReleaseYear() {
         return releaseYear;
     }
@@ -42,6 +46,7 @@ public class MusicItem extends BaseItem {
         this.releaseYear = releaseYear;
     }
 
+    @JsonProperty
     public BigDecimal getPrice() {
         return price;
     }

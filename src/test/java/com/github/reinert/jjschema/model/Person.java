@@ -19,6 +19,7 @@
 package com.github.reinert.jjschema.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Collection;
 
@@ -26,11 +27,10 @@ public class Person {
 
     String name;
     int age;
-    @JsonManagedReference
     Collection<TaskList> createdTasks;
-    @JsonManagedReference("assigned")
     Collection<TaskList> assignedTasks;
 
+    @JsonProperty
     public String getName() {
         return name;
     }
@@ -39,6 +39,7 @@ public class Person {
         this.name = name;
     }
 
+    @JsonProperty
     public int getAge() {
         return age;
     }
@@ -47,6 +48,7 @@ public class Person {
         this.age = age;
     }
 
+    @JsonManagedReference
     public Collection<TaskList> getCreatedTasks() {
         return createdTasks;
     }
@@ -55,6 +57,7 @@ public class Person {
         this.createdTasks = createdTasks;
     }
 
+    @JsonManagedReference("assigned")
     public Collection<TaskList> getAssignedTasks() {
         return assignedTasks;
     }

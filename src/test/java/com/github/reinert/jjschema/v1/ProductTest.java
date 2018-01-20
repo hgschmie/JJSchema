@@ -18,42 +18,51 @@
 
 package com.github.reinert.jjschema.v1;
 
+import static com.github.reinert.jjschema.TestUtility.generateSchema;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.reinert.jjschema.JsonSchemaGenerator;
+import com.github.reinert.jjschema.SchemaGeneratorBuilder;
 import com.github.reinert.jjschema.annotations.JsonSchema;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import junit.framework.TestCase;
+import org.junit.Test;
 
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class ProductTest extends TestCase {
+public class ProductTest {
 
-    ObjectWriter om = new ObjectMapper().writerWithDefaultPrettyPrinter();
-    JsonSchemaFactory schemaFactory = new JsonSchemaV4Factory();
-
-    {
-        schemaFactory.setAutoPutDollarSchema(true);
-    }
+    private final JsonSchemaGenerator schemaGenerator = SchemaGeneratorBuilder.draftV4Schema().build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final ObjectWriter om = MAPPER.writerWithDefaultPrettyPrinter();
 
     /**
      * Test the scheme generate following a scheme source, avaliable at http://json-schema.org/example1.html the output should match the example.
      */
+    @Test
     public void testProductSchema() throws Exception {
-        JsonNode productSchema = schemaFactory.createSchema(Product.class);
 
-        String expectedResult = CharStreams.toString(new InputStreamReader(
-                Thread.currentThread().getContextClassLoader().getResourceAsStream("product_schema.json"), Charsets.UTF_8));
-
+        final InputStream in = ProductTest.class.getResourceAsStream("/product_schema.json");
+        assertNotNull("stream not found", in);
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualObj = mapper.readTree(expectedResult);
+        JsonNode fromFile = mapper.readTree(in);
 
-        assertEquals(productSchema, actualObj);
+        ObjectNode productSchema = generateSchema(schemaGenerator, Product.class);
+
+        assertEquals(fromFile, productSchema);
 
         //TODO: Add support to custom Iterable classes?
         // NOTE that my implementation of ProductSet uses the ComplexProduct
@@ -71,15 +80,12 @@ public class ProductTest extends TestCase {
     @JsonSchema(title = "Product", description = "A product from Acme's catalog")
     static class Product {
 
-        @JsonSchema(required = true, description = "The unique identifier for a product")
         private long id;
-        @JsonSchema(required = true, description = "Name of the product")
         private String name;
-        @JsonSchema(required = true, minimum = 0, exclusiveMinimum = true)
         private BigDecimal price;
-        @JsonSchema(minItems = 1, uniqueItems = true)
         private List<String> tags;
 
+        @JsonSchema(required = true, description = "The unique identifier for a product")
         public long getId() {
             return id;
         }
@@ -88,6 +94,7 @@ public class ProductTest extends TestCase {
             this.id = id;
         }
 
+        @JsonSchema(required = true, description = "Name of the product")
         public String getName() {
             return name;
         }
@@ -96,6 +103,7 @@ public class ProductTest extends TestCase {
             this.name = name;
         }
 
+        @JsonSchema(required = true, minimum = 0, exclusiveMinimum = true)
         public BigDecimal getPrice() {
             return price;
         }
@@ -104,6 +112,7 @@ public class ProductTest extends TestCase {
             this.price = price;
         }
 
+        @JsonSchema(minItems = 1, uniqueItems = true)
         public List<String> getTags() {
             return tags;
         }
@@ -111,15 +120,14 @@ public class ProductTest extends TestCase {
         public void setTags(List<String> tags) {
             this.tags = tags;
         }
-
     }
 
     static class ComplexProduct extends Product {
 
         private Dimension dimensions;
-        @JsonSchema(description = "Coordinates of the warehouse with the product")
         private Geo warehouseLocation;
 
+        @JsonProperty
         public Dimension getDimensions() {
             return dimensions;
         }
@@ -128,6 +136,7 @@ public class ProductTest extends TestCase {
             this.dimensions = dimensions;
         }
 
+        @JsonSchema(description = "Coordinates of the warehouse with the product")
         public Geo getWarehouseLocation() {
             return warehouseLocation;
         }
@@ -140,13 +149,11 @@ public class ProductTest extends TestCase {
 
     static class Dimension {
 
-        @JsonSchema(required = true)
         private double length;
-        @JsonSchema(required = true)
         private double width;
-        @JsonSchema(required = true)
         private double height;
 
+        @JsonSchema(required = true)
         public double getLength() {
             return length;
         }
@@ -155,6 +162,7 @@ public class ProductTest extends TestCase {
             this.length = length;
         }
 
+        @JsonSchema(required = true)
         public double getWidth() {
             return width;
         }
@@ -163,6 +171,7 @@ public class ProductTest extends TestCase {
             this.width = width;
         }
 
+        @JsonSchema(required = true)
         public double getHeight() {
             return height;
         }
@@ -179,6 +188,7 @@ public class ProductTest extends TestCase {
         private BigDecimal latitude;
         private BigDecimal longitude;
 
+        @JsonProperty
         public BigDecimal getLatitude() {
             return latitude;
         }
@@ -187,6 +197,7 @@ public class ProductTest extends TestCase {
             this.latitude = latitude;
         }
 
+        @JsonProperty
         public BigDecimal getLongitude() {
             return longitude;
         }
@@ -213,5 +224,4 @@ public class ProductTest extends TestCase {
         }
 
     }
-
 }

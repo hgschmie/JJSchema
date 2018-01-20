@@ -18,15 +18,19 @@
 
 package com.github.reinert.jjschema;
 
+import com.google.common.reflect.TypeToken;
+
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.AbstractCollection;
+import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -89,14 +93,25 @@ public enum SimpleTypeMappings {
      * @param type the class
      * @return the primitive type if found, {@code null} otherwise
      */
-    public static String forClass(final Type type) {
+    public static Optional<String> forClass(final Type type) {
         if (!(type instanceof Class)) {
-            return null;
+            return Optional.empty();
+        } else if (MAPPINGS.containsKey(type)) {
+            return Optional.of(MAPPINGS.get(type));
+        } else {
+            return Optional.empty();
         }
-        if (AbstractCollection.class.isAssignableFrom((Class<?>) type)) {
-            return "array";
+    }
+
+    private static Class [] COLLECTION_CLASSES = new Class[] {Collection.class, Iterable.class};
+    public static boolean isCollectionLike(Type type) {
+        TypeToken token = TypeToken.of(type);
+        for (Class collectionClass : COLLECTION_CLASSES) {
+            if (collectionClass.isAssignableFrom(token.getRawType())) {
+                return true;
+            }
         }
-        return MAPPINGS.get(type);
+        return false;
     }
 
     /**
