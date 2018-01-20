@@ -14,6 +14,8 @@
 package de.softwareforge.jsonschema;
 
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import java.util.function.Function;
@@ -54,6 +56,12 @@ public final class JsonSchemaGeneratorBuilder {
 
         public JsonSchemaGeneratorConfigurationBuilder processFields() {
             builder.processFields();
+            return this;
+        }
+
+        public JsonSchemaGeneratorConfigurationBuilder customNodeFactory(JsonNodeFactory nodeFactory) {
+            checkNotNull(nodeFactory, "nodeFactory is null");
+            builder.customNodeFactory(nodeFactory);
             return this;
         }
 
