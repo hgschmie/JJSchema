@@ -8,27 +8,27 @@
         <version>25</version>
     </parent>
 
-    <groupId>com.github.reinert</groupId>
-    <artifactId>jjschema</artifactId>
-    <version>1.9-SNAPSHOT</version>
+    <groupId>de.softwareforge</groupId>
+    <artifactId>jsonschema</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
-        <basepom.check.skip-license>true</basepom.check.skip-license>
         <dep.jackson.version>2.8.10</dep.jackson.version>
     </properties>
 
     <licenses>
         <license>
-            <name>ASLv2 or later</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
     <scm>
-        <connection>scm:git:ssh://github.com/reinert/JJSchema.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/reinert/JJSchema.git</developerConnection>
-        <url>https://github.com/reinert/JJSchema</url>
+        <connection>scm:git:ssh://github.com/hgschmie/jsonschema.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/hgschmie/jsonschema.git</developerConnection>
+        <url>https://github.com/hgschmie/jsonschema</url>
         <tag>HEAD</tag>
     </scm>
 
