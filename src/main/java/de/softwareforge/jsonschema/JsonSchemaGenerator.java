@@ -11,9 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.softwareforge.jsonschema;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 
@@ -97,7 +97,6 @@ public final class JsonSchemaGenerator {
     }
 
     private <T> void createSchemaForType(ObjectNode schema, Type type, Optional<AttributeHolder> attributes) {
-
         if (dictionary.contains(type)) {
             throw new IllegalStateException("Recursion detected, not supported!");
         }
@@ -169,9 +168,6 @@ public final class JsonSchemaGenerator {
         }
     }
 
-    /**
-     * Utility method to find properties from a Java Type following Beans Convention.
-     */
     private Map<String, ObjectNode> findSchemaPropertiesFromMethods(Type type, ObjectNode parent) {
         Map<String, ObjectNode> propertyMap = config.sortSchemaProperties() ? new TreeMap<>() : new LinkedHashMap<>();
 
@@ -203,7 +199,8 @@ public final class JsonSchemaGenerator {
 
                     TypeToken<?> returnType = implementingTypeToken.resolveType(method.getGenericReturnType());
 
-                    ObjectNode propertyNode = generateObjectNode(returnType.getType(), attributes);
+                    ObjectNode propertyNode = nodeFactory.objectNode();
+                    createSchemaForType(propertyNode, returnType.getType(), Optional.of(attributes));
                     propertyMap.put(propertyName, propertyNode);
                 }
             }
@@ -212,9 +209,6 @@ public final class JsonSchemaGenerator {
         return propertyMap;
     }
 
-    /**
-     * Utility method to find properties from a Java Type following Beans Convention.
-     */
     private Map<String, ObjectNode> findSchemaPropertiesFromFields(Type type, ObjectNode parent) {
         Map<String, ObjectNode> propertyMap = config.sortSchemaProperties() ? new TreeMap<>() : new LinkedHashMap<>();
 
@@ -243,8 +237,10 @@ public final class JsonSchemaGenerator {
                         continue;
                     }
 
-                    TypeToken returnType = implementingTypeToken.resolveType(field.getGenericType());
-                    ObjectNode propertyNode = generateObjectNode(returnType.getType(), attributes);
+                    TypeToken fieldType = implementingTypeToken.resolveType(field.getGenericType());
+
+                    ObjectNode propertyNode = nodeFactory.objectNode();
+                    createSchemaForType(propertyNode, fieldType.getType(), Optional.of(attributes));
                     propertyMap.put(propertyName, propertyNode);
                 }
             }
@@ -308,7 +304,6 @@ public final class JsonSchemaGenerator {
         schema.set("items", itemNode);
     }
 
-
     private void addToRequired(ObjectNode schema, String name) {
         ArrayNode requiredNode;
         if (schema.has("required")) {
@@ -329,7 +324,6 @@ public final class JsonSchemaGenerator {
         }
         propertiesNode.set(name, property);
     }
-
 
     private String propertyName(AnnotatedElement element) {
         if (element instanceof Field) {
@@ -354,34 +348,7 @@ public final class JsonSchemaGenerator {
         throw new IllegalArgumentException(format(Locale.ENGLISH, "%s is not a field or method", element));
     }
 
-    private ObjectNode generateObjectNode(Type returnType, AttributeHolder attributeHolder) {
-
-        ObjectNode schema = nodeFactory.objectNode();
-        createSchemaForType(schema, returnType, Optional.of(attributeHolder));
-
-//        if (SimpleTypeMappings.isCollectionLike(returnType)) {
-//            augmentSchemaWithCollection(schema, returnType);
-//        } else {
-//            createSchemaForType(schema, returnType, Optional.of(attributeHolder));
-//        }
-
-        // augmentAttributes(schema, attributeHolder);
-
-        // Check if the Nullable annotation is present, and if so, add 'null' to type attr
-//        if (attributeHolder.nullable()) {
-//            if ((returnType instanceof Class && ((Class<?>)returnType).isEnum())) {
-//                ((ArrayNode) schema.get("enum")).addNull();
-//            } else {
-//                addTypeToSchema(schema, "null");
-//            }
-//        }
-
-        return schema;
-    }
-
     private void addTypeToSchema(ObjectNode schema, String type) {
-        checkNotNull(type, "type is null");
-
         if (schema.has("type")) {
             JsonNode typeNode = schema.get("type");
             if (typeNode.isArray()) {
