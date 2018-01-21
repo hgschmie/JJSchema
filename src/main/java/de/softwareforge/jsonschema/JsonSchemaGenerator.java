@@ -101,24 +101,30 @@ public final class JsonSchemaGenerator {
             throw new IllegalStateException("Recursion detected, not supported!");
         }
 
+        Optional<String> overriddenType = attributes.isPresent()
+                ? attributes.get().type()
+                : Optional.empty();
+
         // Simple types are a schema with their type.
         Optional<String> s = SimpleTypeMappings.forClass(type);
+
         // If it is a simple type, then just put the type
         if (s.isPresent()) {
-            addTypeToSchema(schema, s.get());
+            // this is a cop-out, because only simple types can be overridden.
+            addTypeToSchema(schema, overriddenType.orElse(s.get()));
+            // if a format hint exists, add that as well
+            SimpleTypeMappings.formatHint(type).ifPresent((formatHint) -> schema.put("format", formatHint));
         } else if (SimpleTypeMappings.isCollectionLike(type)) {
             augmentSchemaWithCollection(schema, type);
-        }
-        // void to the null type. Does not really make sense.
-        else if (type == Void.class || type == void.class) {
-            addTypeToSchema(schema, "null");
-        }
-        // If it is an Enum than process like enum
-        else if (isEnum(type, attributes)) {
+            // void to the null type. Does not really make sense.
+        } else if (type == Void.class || type == void.class) {
+            // this is a cop-out, because only simple types can be overridden.
+            addTypeToSchema(schema, overriddenType.orElse("null"));
+            // If it is an Enum than process like enum
+        } else if (isEnum(type, attributes)) {
             augmentSchemaWithEnum((Class<?>) type, schema);
-        }
-        // what about map?
-        else {
+            // what about map?
+        } else {
             dictionary.add(type);
             augmentSchemaWithCustomType(schema, type, attributes);
             dictionary.remove(type);
@@ -135,15 +141,13 @@ public final class JsonSchemaGenerator {
                 // First verifies if it is an integer
                 Long integer = Long.parseLong(value);
                 enumArray.add(integer);
-            }
-            // If not then verifies if it is an floating point number
-            catch (NumberFormatException e) {
+                // If not then verifies if it is an floating point number
+            } catch (NumberFormatException e) {
                 try {
                     BigDecimal number = new BigDecimal(value);
                     enumArray.add(number);
-                }
-                // Otherwise add as String
-                catch (NumberFormatException e1) {
+                    // Otherwise add as String
+                } catch (NumberFormatException e1) {
                     enumArray.add(value);
                 }
             }

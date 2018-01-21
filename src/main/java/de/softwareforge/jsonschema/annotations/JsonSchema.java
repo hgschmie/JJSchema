@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.softwareforge.jsonschema.annotations;
 
 import java.lang.annotation.ElementType;
@@ -64,4 +65,6 @@ public @interface JsonSchema {
     boolean readonly() default false;
 
     boolean additionalProperties() default true;
+
+    String type() default "";
 }

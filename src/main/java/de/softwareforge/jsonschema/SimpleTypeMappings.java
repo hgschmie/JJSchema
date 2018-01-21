@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.softwareforge.jsonschema;
 
 import com.google.common.reflect.TypeToken;
@@ -18,10 +19,16 @@ import com.google.common.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.Date;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -29,60 +36,86 @@ import java.util.UUID;
 
 enum SimpleTypeMappings {
     // Integer types
-    PRIMITIVE_BYTE(byte.class, "integer"),
-    PRIMITIVE_SHORT(short.class, "integer"),
-    PRIMITIVE_INTEGER(int.class, "integer"),
-    PRIMITIVE_LONG(long.class, "integer"),
-    BYTE(Byte.class, "integer"),
-    SHORT(Short.class, "integer"),
-    INTEGER(Integer.class, "integer"),
-    LONG(Long.class, "integer"),
-    BIGINTEGER(BigInteger.class, "integer"),
+    PRIMITIVE_BYTE(byte.class, "integer", ""),
+    PRIMITIVE_SHORT(short.class, "integer", ""),
+    PRIMITIVE_INTEGER(int.class, "integer", ""),
+    PRIMITIVE_LONG(long.class, "integer", ""),
+    BYTE(Byte.class, "integer", ""),
+    SHORT(Short.class, "integer", ""),
+    INTEGER(Integer.class, "integer", ""),
+    LONG(Long.class, "integer", ""),
+    BIGINTEGER(BigInteger.class, "integer", ""),
     // Number types
-    PRIMITIVE_FLOAT(float.class, "number"),
-    PRIMITIVE_DOUBLE(double.class, "number"),
-    FLOAT(Float.class, "number"),
-    DOUBLE(Double.class, "number"),
-    BIGDECIMAL(BigDecimal.class, "number"),
+    PRIMITIVE_FLOAT(float.class, "number", ""),
+    PRIMITIVE_DOUBLE(double.class, "number", ""),
+    FLOAT(Float.class, "number", ""),
+    DOUBLE(Double.class, "number", ""),
+    BIGDECIMAL(BigDecimal.class, "number", ""),
     // Boolean types
-    PRIMITIVE_BOOLEAN(boolean.class, "boolean"),
-    BOOLEAN(Boolean.class, "boolean"),
+    PRIMITIVE_BOOLEAN(boolean.class, "boolean", ""),
+    BOOLEAN(Boolean.class, "boolean", ""),
     // String types
-    PRIMITIVE_CHAR(char.class, "string"),
-    CHAR(Character.class, "string"),
-    CHARSEQUENCE(CharSequence.class, "string"),
-    STRING(String.class, "string"),
-    UUID(UUID.class, "string"),
-    ZONEDDATETIME(ZonedDateTime.class, "string"),
-    LOCALDATE(LocalDate.class, "string"),
-    INSTANT(Instant.class, "string");
+    PRIMITIVE_CHAR(char.class, "string", ""),
+    CHAR(Character.class, "string", ""),
+    CHARSEQUENCE(CharSequence.class, "string", ""),
+    STRING(String.class, "string", ""),
+    // special
+    UUID(UUID.class, "string", "uuid"),
+    URI(URI.class, "string", "uri"),
+
+    // date and time
+    ZONEDDATETIME(ZonedDateTime.class, "string", "date-time"),
+    LOCALDATETIME(LocalDateTime.class, "string", "date-time"),
+    OFFSETDATETIME(OffsetDateTime.class, "string", "date-time"),
+    LOCALDATE(LocalDate.class, "string", "date"),
+    LOCALTIME(LocalTime.class, "string", "time"),
+    OFFSETTIME(OffsetTime.class, "string", "time"),
+    DATE(Date.class, "string", "date-time"),
+    INSTANT(Instant.class, "string", "date-time");
 
     private static final Class[] COLLECTION_CLASSES = new Class[]{Collection.class, Iterable.class};
 
-    private static final Map<Class<?>, String> MAPPINGS;
+    private static final Map<Class<?>, String> TYPE_MAPPINGS;
+    private static final Map<Class<?>, String> FORMAT_MAPPINGS;
 
     static {
         // Class objects are all singletons, so we can use that
-        MAPPINGS = new IdentityHashMap<Class<?>, String>();
+        TYPE_MAPPINGS = new IdentityHashMap<Class<?>, String>();
+        FORMAT_MAPPINGS = new IdentityHashMap<Class<?>, String>();
 
         for (final SimpleTypeMappings mapping : values()) {
-            MAPPINGS.put(mapping.c, mapping.schemaType);
+            TYPE_MAPPINGS.put(mapping.c, mapping.schemaType);
+            if (!mapping.formatHint.isEmpty()) {
+                FORMAT_MAPPINGS.put(mapping.c, mapping.formatHint);
+            }
         }
     }
 
     private final Class<?> c;
     private final String schemaType;
+    private final String formatHint;
 
-    SimpleTypeMappings(final Class<?> c, final String schemaType) {
+    SimpleTypeMappings(final Class<?> c, final String schemaType, final String formatHint) {
         this.c = c;
         this.schemaType = schemaType;
+        this.formatHint = formatHint;
     }
 
     static Optional<String> forClass(final Type type) {
         if (!(type instanceof Class)) {
             return Optional.empty();
-        } else if (MAPPINGS.containsKey(type)) {
-            return Optional.of(MAPPINGS.get(type));
+        } else if (TYPE_MAPPINGS.containsKey(type)) {
+            return Optional.of(TYPE_MAPPINGS.get(type));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    static Optional<String> formatHint(final Type type) {
+        if (!(type instanceof Class)) {
+            return Optional.empty();
+        } else if (FORMAT_MAPPINGS.containsKey(type)) {
+            return Optional.of(FORMAT_MAPPINGS.get(type));
         } else {
             return Optional.empty();
         }
