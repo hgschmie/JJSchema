@@ -28,4 +28,18 @@ public class BugsTest {
             return "1";
         }
     }
+
+    // Non-bean methods should be treated as names directly.
+    @Test
+    public void testPropertyBug() throws Exception {
+        ObjectNode schema = generateSchema(schemaGenerator, PropertyBug.class);
+        testWithProperties(schema, "xxx");
+    }
+
+    public static class PropertyBug {
+        @JsonProperty
+        public String xxx() {
+            return "1";
+        }
+    }
 }

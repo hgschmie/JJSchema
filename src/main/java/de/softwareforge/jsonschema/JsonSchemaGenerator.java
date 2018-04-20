@@ -345,8 +345,14 @@ public final class JsonSchemaGenerator {
                     }
                 }
             } catch (IntrospectionException e) {
-                // ignore, let the throw statement below execute.
+                throw new IllegalStateException(format(Locale.ENGLISH, "Could not locate property name for %s", method.getName()), e);
             }
+
+            // getter style
+            if (method.getParameterCount() == 0 && method.getReturnType() != Void.TYPE) {
+                return method.getName();
+            }
+
             throw new IllegalStateException(format(Locale.ENGLISH, "Could not locate property name for %s", method.getName()));
         }
         throw new IllegalArgumentException(format(Locale.ENGLISH, "%s is not a field or method", element));
