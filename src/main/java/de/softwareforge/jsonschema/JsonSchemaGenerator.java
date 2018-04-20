@@ -186,7 +186,7 @@ public final class JsonSchemaGenerator {
                 Optional<AttributeHolder> attributeHolder = acceptMethod(method);
                 if (attributeHolder.isPresent()) {
                     AttributeHolder attributes = attributeHolder.get();
-                    String propertyName = attributes.named().orElse(propertyName(method));
+                    String propertyName = attributes.named().orElseGet(() -> propertyName(method));
 
                     if (propertyMap.containsKey(propertyName)) {
                         throw new IllegalStateException(format(Locale.ENGLISH,
