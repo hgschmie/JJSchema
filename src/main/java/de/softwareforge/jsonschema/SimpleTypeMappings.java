@@ -14,6 +14,8 @@
 
 package de.softwareforge.jsonschema;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -103,7 +105,16 @@ enum SimpleTypeMappings {
 
     static Optional<String> forClass(final Type type) {
         if (!(type instanceof Class)) {
-            return Optional.empty();
+            TypeToken token = TypeToken.of(type);
+            Class<?> clazz = token.getRawType();
+            if (Optional.class.isAssignableFrom(clazz)) {
+                checkState(clazz.getTypeParameters().length > 0, "No type arguments in return type found!");
+                Type itemType = token.resolveType(clazz.getTypeParameters()[0]).getType();
+
+                return forClass(itemType);
+            } else {
+                return Optional.empty();
+            }
         } else if (TYPE_MAPPINGS.containsKey(type)) {
             return Optional.of(TYPE_MAPPINGS.get(type));
         } else {
