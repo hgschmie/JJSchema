@@ -35,7 +35,7 @@
 
     <groupId>de.softwareforge</groupId>
     <artifactId>jsonschema</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -54,7 +54,7 @@
         <connection>scm:git:ssh://github.com/hgschmie/jsonschema.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/hgschmie/jsonschema.git</developerConnection>
         <url>https://github.com/hgschmie/jsonschema</url>
-        <tag>HEAD</tag>
+        <tag>jsonschema-1.2</tag>
     </scm>
 
     <dependencies>
